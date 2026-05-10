@@ -4,17 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TASENCO</title>
+  
+  <!-- Open Graph Meta Tags para Redes Sociales -->
+  <meta property="og:title" content="TASENCO — Amplificadores Valvulares Boutique" />
+  <meta property="og:description" content="Amplificadores artesanales construidos a mano en Uruguay con componentes NOS. Cada unidad es una pieza única." />
+  <!-- OJO: Cuando lo subas a GitHub, cambiá "tu-usuario" y "tu-repo" por tu link real -->
+  <meta property="og:image" content="https://thacharly.github.io/TASENCO/images/TASENCOorgnobg.webp" />
+  <meta property="og:url" content="https://thacharly.github.io/TASENCO/" />
+  <meta property="og:type" content="website" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Oswald:wght@400;600&family=Rubik+Mono+One&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Work+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="tasenco.css" />
-  <link rel="shortcut icon" href="./images/favicon.ico" type="image/icon" />
+  <link rel="shortcut icon" href="./images/favicon.png" type="image/icon" />
 </head>
 <body>
   <nav class="nav">
     <div class="nav-inner">
   <a href="#" class="logo">
-    <img src="./images/TASENCOorgnobg.png" alt="TASENCO" />
+    <img src="./images/TASENCOorgnobg.webp" alt="TASENCO" />
   </a>
   <ul class="nav-links">
     <li><a href="#productos">Catálogo</a></li>
@@ -113,11 +122,11 @@
   <section class="contact" id="contacto">
     <h2 class="section-title">Contáctanos</h2>
     <p class="section-subtitle">¿Interesado en un amplificador personalizado? Escribinos y hablamos sobre tu sonido ideal.</p>
-    <form class="contact-form" onsubmit="handleContact(event)">
-      <div class="form-group"><input type="text" placeholder="Tu nombre" required /></div>
-      <div class="form-group"><input type="email" placeholder="Tu email" required /></div>
-      <div class="form-group"><textarea placeholder="Tu mensaje..."></textarea></div>
-      <button type="submit" class="btn-submit">Enviar mensaje</button>
+    <form class="contact-form" id="contactForm" onsubmit="handleContact(event)">
+      <div class="form-group"><input type="text" id="contactName" name="name" placeholder="Tu nombre" required /></div>
+      <div class="form-group"><input type="email" id="contactEmail" name="email" placeholder="Tu email" required /></div>
+      <div class="form-group"><textarea id="contactMessage" name="message" placeholder="Tu mensaje..." required></textarea></div>
+      <button type="submit" class="btn-submit" id="submitBtn">Enviar mensaje</button>
     </form>
   </section>
 

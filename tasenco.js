@@ -5,7 +5,7 @@ const products = [{
   price: 2890,
   description: 'Combo de 5 watts con una sola válvula EL34. Sonido limpio y cristalino que se rompe con gracia al subir el volumen.',
   specs: ['1× EL34', 'Transformador Primus UK', 'Caja de pino americano', 'Reverb spring'],
-  image: './images/TASENCObk.png',
+  image: './images/TASENCObk.webp',
   featured: false
 }, {
   id: 2,
@@ -14,7 +14,7 @@ const products = [{
   price: 4290,
   description: 'La versión potente del Phoenix. Cuatro válvulas EL34 que ofrecen desde cleans cálidos hasta crunch clásico.',
   specs: ['4× EL34', 'Transformador Primus UK', 'Caja de caoba', 'Reverb spring + tremolo'],
-  image: './images/TASENCObk.png',
+  image: './images/TASENCObk.webp',
   featured: true
 }, {
   id: 3,
@@ -23,7 +23,7 @@ const products = [{
   price: 3650,
   description: 'Head de tres canales con preamplificación híbrida. ECC83 + 6L6.',
   specs: ['2× ECC83 + 2× 6L6', 'Transformador Primus UK', 'Caja de acero y madera', '3 canales independientes'],
-  image: './images/TASENCObk.png',
+  image: './images/TASENCObk.webp',
   featured: false
 }, {
   id: 4,
@@ -32,7 +32,7 @@ const products = [{
   price: 1950,
   description: 'Pequeño pero poderoso. Un solo EL84 que produce un sonido vintage inconfundible.',
   specs: ['1× EL84', 'Transformador Primus UK', 'Caja de pino', 'Puerto de altavoz 8"'],
-  image: './images/TASENCObk.png',
+  image: './images/TASENCObk.webp',
   featured: false
 }, {
   id: 5,
@@ -41,7 +41,7 @@ const products = [{
   price: 6490,
   description: 'Nuestro amplificador insignia. Cabecera y combo en caja de roble con 100W.',
   specs: ['8× EL34', 'Transformador Primus UK', 'Caja de roble americano', 'Cabina 2×12'],
-  image: './images/TASENCObk.png',
+  image: './images/TASENCObk.webp',
   featured: false
 }, {
   id: 6,
@@ -50,7 +50,7 @@ const products = [{
   price: 490,
   description: 'Pedal de delay analógico con válvula ECC83. Hasta 12 segundos de eco.',
   specs: ['1× ECC83', 'Circuito totalmente analógico', 'Control de tempo, feedback y tone'],
-  image: './images/TASENCObk.png',
+  image: './images/TASENCObk.webp',
   featured: false
 }];
 
@@ -287,10 +287,40 @@ function showToast(msg) {
   setTimeout(() => t.remove(), 3400);
 }
 
-function handleContact(e) {
+async function handleContact(e) {
   e.preventDefault();
-  showToast('¡Mensaje enviado correctamente!');
-  e.target.reset();
+  
+  const form = e.target;
+  const btn = document.getElementById('submitBtn');
+  const originalText = btn.textContent;
+  
+  // ACÁ: Cambiá esto por el link que te tira Formspree
+  const FORMSPREE_URL = "https://formspree.io/f/TU_CODIGO_ACA"; 
+  
+  btn.textContent = "ENVIANDO...";
+  btn.disabled = true;
+
+  try {
+    const response = await fetch(FORMSPREE_URL, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      showToast('¡Mensaje enviado! Nos contactaremos a la brevedad.');
+      form.reset();
+    } else {
+      showToast('Error de servidor. Intentá de nuevo.');
+    }
+  } catch (error) {
+    showToast('Error de red. Revisá tu conexión a internet.');
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
 }
 
 updateCartCount();
