@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TASENCO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Oswald:wght@400;600&family=Rubik+Mono+One&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Work+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tasenco.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+  <a href="#" class="logo">
+    <img src="./images/TASENCOorgnobg.png" alt="TASENCO" />
+  </a>
+  <ul class="nav-links">
+    <li><a href="#productos">Catálogo</a></li>
+    <li><a href="#about">Nosotros</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+    <li>
+      <button class="cart-btn" onclick="openCart()">
+        Carrito <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </li>
+  </ul>
+</div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Sonido valvular uruguayo</h1>
+      <p>Amplificadores artesanales construidos a mano con componentes NOS. Cada unidad es una pieza única.</p>
+      <a href="#productos" class="btn-primary">Explorar catálogo →</a>
+    </div>
+  </section>
+
+  <section class="products" id="productos">
+    <h2 class="section-title">Nuestros amplificadores</h2>
+    <p class="section-subtitle">Cada amplificador es ensamblado a mano en nuestro taller, con transformadores hechos a mano y válvulas New-Old-Stock seleccionadas.</p>
+
+    <div class="search-wrapper">
+      <input type="text" id="searchInput" placeholder="Buscar amplificador..." />
+    </div>
+
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="product-grid" id="productGrid"></div>
+  </section>
+
+  <!-- Modal de producto -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalContent">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <img class="modal-img" id="modalImg" src="" alt="" />
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Modal del carrito -->
+  <div class="cart-overlay" id="cartOverlay">
+    <div class="cart-modal" id="cartModalContent">
+      <button class="cart-close" onclick="closeCart()">✕</button>
+      <div class="cart-title">Tu Carrito</div>
+      <div id="cartItemsContainer"></div>
+      <div id="cartSummary" style="display:none;">
+        <div class="cart-summary">
+          <div class="cart-summary-row"><span>Subtotal</span><span id="subtotalDisplay">USD 0</span></div>
+          <div class="cart-summary-row" id="discountRow" style="display:none;"><span>Descuento</span><span id="discountDisplay">-USD 0</span></div>
+          <div class="cart-shipping">
+            <label>Envío</label>
+            <div>
+              <label><input type="radio" name="shipping" value="15" checked onchange="updateCartSummary()"> Estándar (USD 15)</label>
+              <label><input type="radio" name="shipping" value="30" onchange="updateCartSummary()"> Express (USD 30)</label>
+            </div>
+          </div>
+          <div class="cart-summary-row"><span>Envío</span><span id="shippingDisplay">USD 15</span></div>
+          <div class="cart-summary-row cart-total"><span>Total</span><span id="totalDisplay">USD 0</span></div>
+        </div>
+        <div class="cart-promo">
+          <label for="promoCode">Código de promoción</label>
+          <input type="text" id="promoCode" placeholder="Ej: TUBE10" />
+          <button onclick="applyPromo()">Aplicar</button>
+          <span id="promoMessage" style="font-family: var(--font-mono); font-size:0.8rem; color: var(--rust); display:block; margin-top:0.3rem;"></span>
+        </div>
+        <div class="cart-contact">
+          <label>Datos de contacto</label>
+          <input type="email" id="cartEmail" placeholder="Email (obligatorio)" />
+          <input type="tel" id="cartPhone" placeholder="Teléfono" style="margin-top:0.5rem;" />
+        </div>
+        <div class="cart-payment">
+          <label>Método de pago</label>
+          <div>
+            <label><input type="radio" name="payment" value="card" checked> Tarjeta</label>
+            <label><input type="radio" name="payment" value="paypal"> PayPal</label>
+            <label><input type="radio" name="payment" value="transfer"> Transferencia</label>
+          </div>
+        </div>
+        <button class="cart-checkout-btn" onclick="checkout()">Realizar pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="about" id="about">
+    <h2 class="section-title">Nuestra historia</h2>
+    <div class="about-content">
+      <p>TASENCO nació en 2011 de la pasión por el sonido cálido y orgánico que solo las válvulas pueden ofrecer. Cada amplificador es ensamblado a mano en nuestro taller, con transformadores hechos a mano y válvulas New-Old-Stock seleccionadas.</p>
+      <p style="margin-top:1.2em;">No fabricamos en masa. Producimos en serie limitada para garantizar la calidad artesanal en cada unidad. Nuestro compromiso es crear amplificadores que no solo suenen bien, sino que también cuenten una historia.</p>
+    </div>
+  </section>
+
+  <section class="contact" id="contacto">
+    <h2 class="section-title">Contáctanos</h2>
+    <p class="section-subtitle">¿Interesado en un amplificador personalizado? Escribinos y hablamos sobre tu sonido ideal.</p>
+    <form class="contact-form" onsubmit="handleContact(event)">
+      <div class="form-group"><input type="text" placeholder="Tu nombre" required /></div>
+      <div class="form-group"><input type="email" placeholder="Tu email" required /></div>
+      <div class="form-group"><textarea placeholder="Tu mensaje..."></textarea></div>
+      <button type="submit" class="btn-submit">Enviar mensaje</button>
+    </form>
+  </section>
+
+  <footer class="footer">
+    <span class="footer-logo">TASENCO</span>
+    <span class="footer-copy">2026 TASENCO®. Todos los derechos reservados.</span>
+    <div class="footer-plant">EL PINAR · CANELONES · URUGUAY</div>
+  </footer>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="tasenco.js"></script>
+</body>
+</html>
