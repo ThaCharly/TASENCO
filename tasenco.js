@@ -294,7 +294,6 @@ async function handleContact(e) {
   const btn = document.getElementById('submitBtn');
   const originalText = btn.textContent;
   
-  
   const FORMSPREE_URL = "https://formspree.io/f/mjglpwqg"; 
   
   btn.textContent = "ENVIANDO...";
@@ -313,9 +312,18 @@ async function handleContact(e) {
       showToast('¡Mensaje enviado! Nos contactaremos a la brevedad.');
       form.reset();
     } else {
-      showToast('Error de servidor. Intentá de nuevo.');
+      const data = await response.json();
+      console.error("Error de Formspree:", data);
+      
+      if (Object.hasOwn(data, 'errors')) {
+        const formspreeErrors = data.errors.map(err => err.message).join(", ");
+        showToast('Error: ' + formspreeErrors);
+      } else {
+        showToast('Error de servidor. Fijate en la consola.');
+      }
     }
   } catch (error) {
+    console.error("Error de red:", error);
     showToast('Error de red. Revisá tu conexión a internet.');
   } finally {
     btn.textContent = originalText;
