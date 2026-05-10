@@ -294,7 +294,7 @@ async function handleContact(e) {
   const btn = document.getElementById('submitBtn');
   const originalText = btn.textContent;
   
-  // ACÁ: Cambiá esto por el link que te tira Formspree
+  
   const FORMSPREE_URL = "https://formspree.io/f/mjglpwqg"; 
   
   btn.textContent = "ENVIANDO...";
