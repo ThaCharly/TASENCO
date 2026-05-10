@@ -1,64 +1,43 @@
-const products = [{
-  id: 1,
-  name: 'PHOENIX-5W',
-  category: 'Combo',
-  price: 2890,
-  description: 'Combo de 5 watts con una sola válvula EL34. Sonido limpio y cristalino que se rompe con gracia al subir el volumen.',
-  specs: ['1× EL34', 'Transformador Primus UK', 'Caja de pino americano', 'Reverb spring'],
-  image: './images/TASENCObk.webp',
-  featured: false
-}, {
-  id: 2,
-  name: 'PHOENIX-50W',
-  category: 'Combo',
-  price: 4290,
-  description: 'La versión potente del Phoenix. Cuatro válvulas EL34 que ofrecen desde cleans cálidos hasta crunch clásico.',
-  specs: ['4× EL34', 'Transformador Primus UK', 'Caja de caoba', 'Reverb spring + tremolo'],
-  image: './images/TASENCObk.webp',
-  featured: true
-}, {
-  id: 3,
-  name: 'ATLAS-HEAD',
-  category: 'Head',
-  price: 3650,
-  description: 'Head de tres canales con preamplificación híbrida. ECC83 + 6L6.',
-  specs: ['2× ECC83 + 2× 6L6', 'Transformador Primus UK', 'Caja de acero y madera', '3 canales independientes'],
-  image: './images/TASENCObk.webp',
-  featured: false
-}, {
-  id: 4,
-  name: 'LUNA-MINI',
-  category: 'Combo',
-  price: 1950,
-  description: 'Pequeño pero poderoso. Un solo EL84 que produce un sonido vintage inconfundible.',
-  specs: ['1× EL84', 'Transformador Primus UK', 'Caja de pino', 'Puerto de altavoz 8"'],
-  image: './images/TASENCObk.webp',
-  featured: false
-}, {
-  id: 5,
-  name: 'TITAN-STACK',
-  category: 'Stack',
-  price: 6490,
-  description: 'Nuestro amplificador insignia. Cabecera y combo en caja de roble con 100W.',
-  specs: ['8× EL34', 'Transformador Primus UK', 'Caja de roble americano', 'Cabina 2×12'],
-  image: './images/TASENCObk.webp',
-  featured: false
-}, {
-  id: 6,
-  name: 'ECHO-PDL',
-  category: 'Pedales',
-  price: 490,
-  description: 'Pedal de delay analógico con válvula ECC83. Hasta 12 segundos de eco.',
-  specs: ['1× ECC83', 'Circuito totalmente analógico', 'Control de tempo, feedback y tone'],
-  image: './images/TASENCObk.webp',
-  featured: false
-}];
-
+// Arrancamos con el catálogo vacío. Ya no es 'const', es 'let' porque se va a llenar dinámicamente.
+let products = []; 
 let cart = JSON.parse(localStorage.getItem('TASENCO-cart') || '[]');
 let discountPercent = 0;
 let activeFilter = 'Todos';
 let searchQuery = '';
-const categories = ['Todos', ...new Set(products.map(p => p.category))];
+let categories = ['Todos']; // Esto también se va a poblar dinámicamente
+
+// --- LÓGICA DE CONEXIÓN CON EL BACKEND C++ ---
+async function bootCatalog() {
+  try {
+    // Le pegamos al endpoint que armaste con Crow
+    const response = await fetch('http://192.168.1.26:8080/api/productos');
+    
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+
+    // Volcamos la memoria de C++ en nuestra variable de JS
+    products = await response.json();
+    
+    // Ahora que tenemos los datos, extraemos las categorías únicas
+    categories = ['Todos', ...new Set(products.map(p => p.category))];
+    
+    // Encendemos la interfaz
+    renderFilters();
+    renderProducts('Todos');
+    
+  } catch (error) {
+    console.error("[FALLO DE SISTEMA] No se pudo conectar al servidor:", error);
+    // Si el backend está apagado, mostramos un error técnico en pantalla
+    document.getElementById('productGrid').innerHTML = `
+      <div style="grid-column: 1/-1; padding: 3rem; border: 2px dashed var(--rust); background: var(--surface-alt); text-align: center;">
+        <h3 style="font-family: var(--font-techno); color: var(--rust); font-size: 1.5rem; margin-bottom: 1rem;">[ERROR DE ENLACE]</h3>
+        <p style="font-family: var(--font-mono); font-size: 0.9rem;">No hay respuesta del servidor central (localhost:8080).</p>
+        <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem;">Verificá que el ejecutable de C++ esté corriendo.</p>
+      </div>
+    `;
+  }
+}
 
 function renderFilters() {
   document.getElementById('filterBar').innerHTML = categories.map(cat =>
@@ -104,25 +83,160 @@ function renderProducts(filter) {
 
 function setFilter(cat) { activeFilter = cat; renderFilters(); renderProducts(cat); }
 
+// --- LÓGICA DEL REPRODUCTOR DE AUDIO GLOBAL ---
+const audioPlayer = new Audio();
+let isPlaying = false;
+
+// Evento que actualiza la barra y el tiempo milisegundo a milisegundo
+audioPlayer.addEventListener('timeupdate', () => {
+  const fill = document.getElementById('progressFill');
+  const timeDisp = document.getElementById('timeDisplay');
+  if (fill && timeDisp && audioPlayer.duration) {
+    const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    fill.style.width = percent + '%';
+    timeDisp.textContent = formatTime(audioPlayer.currentTime) + ' / ' + formatTime(audioPlayer.duration);
+  }
+});
+
+// Cuando termina la pista, volvemos al estado inicial
+audioPlayer.addEventListener('ended', () => {
+  isPlaying = false;
+  const btn = document.getElementById('playBtn');
+  if(btn) btn.textContent = '▶';
+});
+
+// Formateador matemático para que los segundos se vean como reloj
+function formatTime(seconds) {
+  if (isNaN(seconds) || !isFinite(seconds)) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+// Función que dispara los tracks cuando tocan los botones
+function loadTrack(url, btnNode) {
+  document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
+  if (btnNode) btnNode.classList.add('active');
+  
+  const wasPlaying = isPlaying;
+  audioPlayer.src = url;
+  audioPlayer.load();
+  
+  if (wasPlaying) {
+    audioPlayer.play().catch(e => console.log('Esperando interacción...'));
+  } else {
+    const fill = document.getElementById('progressFill');
+    const timeDisp = document.getElementById('timeDisplay');
+    if(fill) fill.style.width = '0%';
+    if(timeDisp) timeDisp.textContent = '0:00 / 0:00';
+  }
+}
+
+// Control maestro de Play/Pause
+function togglePlay() {
+  const btn = document.getElementById('playBtn');
+  if (!audioPlayer.src || audioPlayer.src.endsWith('undefined')) return; 
+
+  if (isPlaying) {
+    audioPlayer.pause();
+    isPlaying = false;
+    btn.textContent = '▶';
+  } else {
+    audioPlayer.play().then(() => {
+      isPlaying = true;
+      btn.textContent = '❚❚';
+    }).catch(err => {
+      showToast("Error al reproducir. Quizás el archivo dummy no existe.");
+    });
+  }
+}
+
+// Permite cliquear en la barra para adelantar el riff
+function seekAudio(e) {
+  if (!audioPlayer.duration) return;
+  const wrapper = document.getElementById('progressWrapper');
+  const rect = wrapper.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const percent = clickX / rect.width;
+  audioPlayer.currentTime = percent * audioPlayer.duration;
+}
+// ----------------------------------------------
+
 function openModal(id) {
   const p = products.find(x => x.id === id);
   document.getElementById('modalImg').src = p.image;
   document.getElementById('modalImg').alt = p.name;
+  
+  // Envolvemos la imagen en su contenedor técnico
+  const imgElement = document.getElementById('modalImg');
+  if (!imgElement.parentElement.classList.contains('modal-img-container')) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'modal-img-container';
+    imgElement.parentNode.insertBefore(wrapper, imgElement);
+    wrapper.appendChild(imgElement);
+  }
+
+  // Armamos la sección de audios con estética de diagnóstico
+  let audioHTML = '';
+  if (p.audio && p.audio.length > 0) {
+    audioHTML = `
+      <div class="audio-section">
+        <div class="section-label">PRUEBAS DE DIAGNÓSTICO <span>[HZ/WAV]</span></div>
+        <div class="track-list" id="trackList">
+          ${p.audio.map((trk, i) => `<button class="track-btn ${i===0?'active':''}" onclick="loadTrack('${trk.url}', this)">${trk.name}</button>`).join('')}
+        </div>
+        <div class="audio-controls-custom">
+          <button class="play-btn-custom" id="playBtn" onclick="togglePlay()">▶</button>
+          <div class="progress-wrapper" id="progressWrapper" onclick="seekAudio(event)">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Inyectamos el Plano completo en el Body
   document.getElementById('modalBody').innerHTML = `
-    <span class="product-category">${p.category}</span>
-    <h2 style="font-family: var(--font-techno); font-size: 2rem; margin-bottom: 0.3em; text-transform: uppercase;">${p.name}</h2>
-    <p style="color: var(--muted); line-height: 1.75; margin-bottom: 1.5rem; font-style: italic;">${p.description}</p>
-    <table class="spec-table">
-      ${p.specs.map(s => {
-        const parts = s.split(' ');
-        const label = parts[0];
-        const value = parts.slice(1).join(' ');
-        return `<tr><td>${label}</td><td>${value}</td></tr>`;
-      }).join('')}
-    </table>
-    <p style="font-family: var(--font-mono); font-size: 2rem; color: var(--ink); margin-bottom: 1.5rem; font-weight: 700;">USD ${p.price.toLocaleString()}</p>
-    <button class="btn-primary" onclick="addToCart(${p.id}); closeModal();">Añadir al carrito</button>
+    <div class="cajetin">
+      <div class="c-cell c-title">PLANO // ${p.name}</div>
+      <div class="c-cell">REV: A</div>
+      <div class="c-cell" style="color: var(--muted);">${p.category}</div>
+    </div>
+
+    <div class="blueprint-content">
+      <div class="notes-section">
+        <div class="section-label">NOTAS DE INGENIERÍA <span>[REF. 01]</span></div>
+        <p>${p.description}</p>
+      </div>
+
+      <div class="specs-section">
+        <div class="section-label">L.D.M. (LISTA DE MATERIALES) <span>[BOM]</span></div>
+        <table class="spec-table">
+          ${p.specs.map(s => {
+            const parts = s.split(' ');
+            const label = parts[0];
+            const value = parts.slice(1).join(' ');
+            return `<tr><td>${label}</td><td>${value}</td></tr>`;
+          }).join('')}
+        </table>
+      </div>
+
+      ${audioHTML}
+    </div>
+
+    <div class="modal-footer-tech">
+      <div class="price-tech">USD ${p.price.toLocaleString()}</div>
+      <button class="btn-approve" onclick="addToCart(${p.id}); closeModal();">APROBAR ORDEN →</button>
+    </div>
   `;
+  
+  if (p.audio && p.audio.length > 0) {
+    audioPlayer.src = p.audio[0].url;
+    audioPlayer.load();
+    isPlaying = false;
+  }
+
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -130,6 +244,12 @@ function openModal(id) {
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  
+  // Matar el audio cuando cierran la ficha técnica (FUNDAMENTAL)
+  audioPlayer.pause();
+  isPlaying = false;
+  const btn = document.getElementById('playBtn');
+  if(btn) btn.textContent = '▶';
 }
 document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 
@@ -331,9 +451,11 @@ async function handleContact(e) {
   }
 }
 
+// Arrancamos el contador del carrito (que lee del LocalStorage, no precisa internet)
 updateCartCount();
-renderFilters();
-renderProducts('Todos');
+
+// Disparamos la secuencia de booteo asíncrona
+bootCatalog();
 
 document.getElementById('searchInput').addEventListener('input', e => {
   searchQuery = e.target.value;
@@ -341,8 +463,34 @@ document.getElementById('searchInput').addEventListener('input', e => {
 });
 
 window.addEventListener('scroll', () => {
+  // Cambio de fondo del nav al bajar
   document.querySelector('.nav').classList.toggle('scrolled', window.scrollY > 20);
+
+  // Lógica del Scrollspy: iluminar el nav según la sección
+  let current = '';
+  const sections = document.querySelectorAll('section[id]');
+  // Calculamos el desfase dinámico (los mismos píxeles que le pusimos al CSS de scroll-padding)
+  const offset = window.innerWidth <= 768 ? 120 : 95;
+
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - offset;
+    // Si la pantalla bajó más allá del inicio de esta sección, guardamos su ID
+    if (window.scrollY >= sectionTop) {
+      current = section.getAttribute('id');
+    }
+  });
+
+  // Limpiamos todos los links y prendemos solo el que coincide con la sección actual
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === `#${current}`) {
+      a.classList.add('active');
+    }
+  });
 });
+
+// Corremos el evento una vez al cargar por si la persona refresca la página a la mitad
+window.dispatchEvent(new Event('scroll'));
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeModal();

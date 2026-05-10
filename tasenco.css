@@ -10,7 +10,7 @@
   --ash: #e8e2d7;
   --olive: #5b5e42;
   --ink-blue: #3a4b5c;
-  --ochre: #d4a017;
+  --ochre: #ef7b4a;
   --grid-color: rgba(26, 26, 26, 0.07);
   --shadow-hard: 4px 4px 0 #1a1a1a;
   --font-display: 'Abril Fatface', 'Times New Roman', serif;
@@ -32,6 +32,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 91px; /* 88px del nav + 3px de borde naranja */
 }
 
 body {
@@ -134,8 +135,16 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   transition: color 0.15s;
   text-transform: uppercase;
 }
-.nav-links a:hover {
-  color: var(--ochre);
+/* El hover tradicional solo aplica en PCs con mouse real */
+@media (hover: hover) {
+  .nav-links a:hover {
+    color: var(--ember);
+  }
+}
+/* La clase que va a inyectar el JavaScript según donde hagamos scroll */
+.nav-links a.active {
+  color: var(--ember);
+  text-shadow: 0 0 8px rgba(239, 123, 74, 0.4); /* Brillo naranja de válvula caliente */
 }
 
 .cart-btn {
@@ -161,8 +170,8 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--ochre);
-  color: #000;
+  background: var(--ember);
+  color: #fff; /* Letras blancas sobre naranja, 100% libre de sospechas */
   font-family: var(--font-mono);
   font-size: 0.7rem;
   display: flex;
@@ -539,7 +548,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 }
 
 /* =====================================================
-   MODAL DE PRODUCTO (con tabla técnica)
+   MODAL TIPO PLANO DE FABRICACIÓN (BLUEPRINT)
    ===================================================== */
 .modal-overlay {
   position: fixed;
@@ -559,82 +568,273 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   pointer-events: all;
 }
 .modal {
-  background: var(--bg);
-  max-width: 950px;
+  background: var(--surface-alt);
+  max-width: 1050px;
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  overflow: hidden;
-  border: 3px solid #1a1a1a;
-  outline: 2px solid var(--olive);
-  outline-offset: -8px;
-  box-shadow: 12px 12px 0 rgba(0,0,0,0.4);
+  border: 4px solid var(--ink);
+  box-shadow: 16px 16px 0 rgba(26,26,26,0.9);
   transform: translateY(20px);
   transition: transform 0.2s;
   position: relative;
-  background-image: linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
-  background-size: 100% 8px;
+  /* Grilla de dibujo técnico */
+  background-image: 
+    linear-gradient(rgba(26,26,26,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,26,26,0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 .modal-overlay.open .modal {
   transform: translateY(0);
 }
-.modal-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  min-height: 420px;
-  border-right: 3px solid #1a1a1a;
-  filter: sepia(10%);
-}
-.modal-body {
-  padding: 2.5rem;
-  background: var(--surface);
-  font-family: var(--font-body);
-  display: flex;
-  flex-direction: column;
-}
-.modal-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 36px;
-  height: 36px;
-  background: #1a1a1a;
-  color: #fff;
-  font-family: var(--font-mono);
-  font-size: 1.2rem;
+
+/* Área de imagen tipo render técnico */
+.modal-img-container {
+  padding: 1.5rem;
+  border-right: 4px solid var(--ink);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #1a1a1a;
-  transition: 0.15s;
-  z-index: 10;
+  background: var(--surface);
+  position: relative;
 }
-.modal-close:hover {
-  background: var(--rust);
+/* Cruces de registro (crop marks) */
+.modal-img-container::before, .modal-img-container::after {
+  content: ''; position: absolute; width: 15px; height: 15px; border: 2px solid var(--ink); pointer-events: none;
 }
+.modal-img-container::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+.modal-img-container::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+.modal-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  max-height: 500px;
+  filter: sepia(20%) contrast(1.1) grayscale(0.2);
+}
+
+/* Cuerpo del plano */
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  position: relative;
+}
+
+/* Cajetín (Title Block de Arquitectura) */
+.cajetin {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 4px solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--surface);
+}
+.c-cell {
+  padding: 0.8rem 1rem;
+  border-right: 2px solid var(--ink);
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.c-cell.c-title {
+  background: var(--ink);
+  color: var(--ember);
+  flex: 1;
+  font-size: 1.1rem;
+  font-family: var(--font-techno);
+  letter-spacing: 2px;
+}
+.c-cell:last-child { border-right: none; }
+
+/* Contenido interno */
+.blueprint-content {
+  padding: 2rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  overflow-y: auto;
+}
+.section-label {
+  font-family: var(--font-stamp);
+  font-size: 0.65rem;
+  color: var(--ember);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 0.8rem;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.4rem;
+  display: flex;
+  justify-content: space-between;
+}
+.blueprint-content p {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--ink);
+  background: rgba(255,255,255,0.4);
+  padding: 1rem;
+  border: 1px dashed var(--ink);
+}
+
+/* L.D.M. (Lista de Materiales) */
 .spec-table {
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-mono);
   font-size: 0.8rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid #1a1a1a;
+  border: 2px solid var(--ink);
+  background: var(--surface);
 }
 .spec-table td {
-  padding: 0.5rem 0.8rem;
-  border-bottom: 1px solid #1a1a1a;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--ink);
 }
 .spec-table td:first-child {
-  background: var(--ink);
-  color: var(--ochre);
+  background: rgba(26,26,26,0.05);
+  color: var(--ink);
   text-transform: uppercase;
   letter-spacing: 1px;
-  width: 40%;
-}
-.spec-table td:last-child {
-  background: var(--surface-alt);
+  width: 35%;
   font-weight: 700;
+  border-right: 2px solid var(--ink);
+}
+
+/* Footer Técnico (Precio y Botón) */
+.modal-footer-tech {
+  display: flex;
+  border-top: 4px solid var(--ink);
+  background: var(--surface);
+  margin-top: auto;
+}
+.price-tech {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  border-right: 4px solid var(--ink);
+}
+.btn-approve {
+  border: none;
+  background: var(--ember);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+}
+.btn-approve:hover {
+  background: var(--ink);
+  color: var(--ember);
+}
+
+/* Botón cerrar rediseñado (Aislado del cajetín) */
+.modal-close {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 45px;
+  height: 45px;
+  background: var(--ink);
+  color: var(--ember);
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--surface-alt);
+  border-radius: 50%; /* Lo hacemos redondo para que rompa la ortogonalidad del plano */
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+  transition: 0.15s;
+  z-index: 10;
+  cursor: pointer;
+}
+.modal-close:hover {
+  background: var(--ember);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* =====================================================
+   REPRODUCTOR DE AUDIO (Integrado al plano)
+   ===================================================== */
+.track-list {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.track-btn {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  border: 2px solid var(--ink);
+  background: var(--surface-alt);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.track-btn.active {
+  background: var(--ember);
+  color: #fff;
+}
+.audio-controls-custom {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255,255,255,0.4);
+  padding: 0.8rem;
+  border: 1px dashed var(--ink);
+}
+.play-btn-custom {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--ember);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+.play-btn-custom:hover { background: var(--ember); color: #fff; border-color: var(--ember); }
+.progress-wrapper {
+  flex: 1;
+  height: 14px;
+  background: var(--surface-alt);
+  border: 2px solid var(--ink);
+  cursor: pointer;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--ember);
+  pointer-events: none;
+  transition: width 0.1s linear;
+}
+.time-display {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink);
+  min-width: 80px;
+  text-align: right;
 }
 
 /* =====================================================
@@ -1008,20 +1208,35 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 }
 
 @media(max-width: 768px) {
-  /* NAV: Apilamos el logo arriba y los links abajo para que respire */
+  html {
+    scroll-padding-top: 116px;
+  }
+  
+  /* NAV: Apilamos el logo arriba y los links abajo */
   .nav-inner {
     height: auto;
     padding: 0.8rem 1rem;
     flex-wrap: wrap;
     justify-content: center;
   }
-  .logo { margin-right: 0; margin-bottom: 0.5rem; }
-  .logo img { height: 60px; width: auto; }
-  .nav-links { width: 100%; justify-content: center; gap: 1rem; }
+  .logo { margin-right: 0; margin-bottom: 0.5rem; position: relative; }
+  .logo img { 
+    height: 60px; 
+    width: auto; 
+    transform: scale(2.666); 
+    pointer-events: none; 
+  }
+  .nav-links { 
+    width: 100%; 
+    justify-content: center; 
+    gap: 1rem; 
+    position: relative; 
+    z-index: 10; 
+  }
   .nav-links a { font-size: 0.75rem; }
   .cart-btn { padding: 0.4rem 0.8rem; font-size: 0.7rem; }
 
-  /* PRODUCTOS Y FILTROS: Separamos las cartas y hacemos scrolleable el filtro */
+  /* PRODUCTOS Y FILTROS */
   .product-grid {
     grid-template-columns: 1fr !important;
     padding: 0 1rem;
@@ -1045,24 +1260,92 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   }
   .about-content { margin-left: 0; }
   
-  /* MODAL: Forzamos tamaños más chicos pisando los estilos inyectados del JS */
-  .modal-overlay { padding: 1rem; }
+  /* =========================================
+     CIRUGÍA DEL PLANO TÉCNICO MOBILE 
+     ========================================= */
+  
+  /* Pasamos la responsabilidad del scroll al fondo oscuro */
+  .modal-overlay { 
+    padding: 1rem; 
+    align-items: flex-start; /* Evita que se corte arriba si el cel es chico */
+    overflow-y: auto; 
+  }
+  
   .modal {
     grid-template-columns: 1fr;
-    max-height: 85vh;
-    overflow-y: auto;
+    max-height: none; /* Que crezca lo que necesite, scrollea el overlay */
+    overflow-y: visible; /* MATAMOS LA GUILLOTINA: el botón ya no se recorta */
+    
+    /* MATAMOS EL SCROLL HORIZONTAL: Achicamos la sombra y compensamos el ancho */
+    box-shadow: 6px 6px 0 rgba(26,26,26,0.9);
+    width: calc(100% - 6px); 
+    margin: auto;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
   }
-  .modal-img {
-    min-height: 200px;
-    height: 250px;
+
+  /* Botón de cerrar: Vuelve a su lugar natural, pero más chico */
+  .modal-close {
+    top: -12px;
+    right: -8px; 
+    transform: scale(0.85); 
+  }
+  .modal-close:hover {
+    transform: scale(0.95);
+  }
+
+  /* Achicamos la imagen para que no ocupe media pantalla */
+  .modal-img-container {
     border-right: none;
-    border-bottom: 3px solid #1a1a1a;
+    border-bottom: 4px solid var(--ink);
+    padding: 1rem;
+    min-height: auto;
+    height: 220px; 
   }
-  .modal-body { padding: 1.5rem; }
-  .modal-body h2 { font-size: 1.5rem !important; }
-  .modal-body p { font-size: 0.9rem !important; }
-  .modal-body p:last-of-type { font-size: 1.5rem !important; margin-bottom: 1rem !important; }
-  .spec-table { font-size: 0.75rem; }
+  
+  /* Cajetín colapsado con espacio inteligente */
+  .cajetin { flex-direction: column; }
+  
+  /* Le damos padding derecho al título para que el botón de cerrar no tape la letra */
+  .c-cell.c-title { font-size: 1.1rem; padding: 1rem 2.5rem 1rem 1rem; text-align: left; }
+  .c-cell { border-right: none; border-bottom: 2px solid var(--ink); justify-content: center; text-align: center; padding: 0.6rem; }
+  .c-cell:last-child { border-bottom: none; }
+
+  /* Descomprimimos los elementos inmensos */
+  .blueprint-content { padding: 1rem; gap: 1.2rem; }
+  .blueprint-content p { font-size: 0.8rem; padding: 0.8rem; }
+  
+  .spec-table td { padding: 0.4rem; font-size: 0.75rem; }
+  .spec-table td:first-child { width: 40%; }
+  
+  .modal-footer-tech { flex-direction: column; border-top: 3px solid var(--ink); }
+  
+  /* Achicamos el precio y el botón gigante */
+  .price-tech {
+    border-right: none;
+    border-bottom: 3px solid var(--ink);
+    justify-content: center;
+    font-size: 1.4rem;
+    padding: 0.8rem;
+  }
+  .btn-approve {
+    padding: 0.8rem;
+    font-size: 0.95rem;
+  }
+  
+  .audio-controls-custom { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  .time-display { text-align: left; }
+
+  /* Ajuste rápido para el carrito por si sufría del mismo mal */
+  .cart-modal {
+    max-height: none;
+    overflow-y: visible;
+    width: calc(100% - 6px);
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.3);
+    margin: auto;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+  }
 
   /* FOOTER */
   .footer { flex-direction: column; gap: 1.5rem; text-align: center; }

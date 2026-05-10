@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "name": "PHOENIX-5W",
+    "category": "Combo",
+    "price": 2890,
+    "description": "Combo de 5W con una sola EL34...",
+    "specs": ["1× EL34", "Transformador Primus UK", "Caja de pino americano", "Reverb spring"],
+    "image": "./images/TASENCObk.webp"
+  }
+]
