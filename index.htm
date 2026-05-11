@@ -45,6 +45,10 @@
       <p>Amplificadores artesanales construidos a mano con componentes NOS. Cada unidad es una pieza única.</p>
       <a href="#productos" class="btn-primary">Explorar catálogo →</a>
     </div>
+    <div class="hero-image">
+      <!-- ⚠️ CAMBIÁ ESTA RUTA por la foto real de la válvula o transformador -->
+      <img src="./images/valve-hero.webp" alt="tuuube" />
+    </div>
   </section>
 
   <section class="products" id="productos">
@@ -63,8 +67,8 @@
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal" id="modalContent">
       <button class="modal-close" onclick="closeModal()">✕</button>
-      <div class="modal-img-container">
-        <img class="modal-img" id="modalImg" src="" alt="" />
+      <div class="modal-img-container" id="modalGalleryContainer">
+        <!-- La galería se inyecta por JS acá adentro -->
       </div>
       <div class="modal-body" id="modalBody"></div>
     </div>

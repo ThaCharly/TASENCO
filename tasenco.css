@@ -94,9 +94,16 @@ button {
   z-index: 100;
   background: #1a1a1a;
   border-bottom: 3px solid var(--rust);
+  transition: transform 0.3s ease, background-color 0.3s ease; /* Transición para el Smart Nav */
 }
 .nav.scrolled {
-  background: #0d0d0d;
+  background: rgba(13, 13, 13, 0.85); /* Semitransparente */
+  backdrop-filter: blur(8px); /* Efecto vidrio esmerilado técnico */
+  -webkit-backdrop-filter: blur(8px);
+}
+/* Clase inyectada por JS para esconder la barra */
+.nav.nav-hidden {
+  transform: translateY(-100%);
 }
 .nav-inner {
 max-width: 1300px;
@@ -187,7 +194,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 }
 
 /* =====================================================
-   HERO ESTILO PLANO TÉCNICO
+   HERO ATMOSFÉRICO (Fusión Cinematográfica)
    ===================================================== */
 .hero {
   min-height: 100vh;
@@ -195,46 +202,57 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   align-items: center;
   padding-top: 68px;
   position: relative;
+  background: #1e1b18;  /* fondo liso, sin trama */
   overflow: hidden;
-  background: #1e1b18;
-  /* Fondo de cuadrícula de ingeniería */
+}
+
+/* Si querés los cuadraditos, borrá ésto y reemplaza el after por el comentado
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   background-image: 
     linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
   background-size: 40px 40px;
-}
-.hero::after {
+  pointer-events: none;
+  
+   Máscara: los cuadraditos se ven completos a la izquierda y se esfuman hacia el 60% del ancho
+  -webkit-mask-image: linear-gradient(to right, black 0%, black 35%, transparent 65%);
+  mask-image: linear-gradient(to right, black 0%, black 35%, transparent 65%);
+} */
+
+/* .hero-image::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 80% 20%, rgba(209,92,59,0.15) 0%, transparent 60%);
+  background: 
+    linear-gradient(to right, #1e1b18 0%, transparent 50%),
+    linear-gradient(to top, #1e1b18 0%, transparent 20%),
+    linear-gradient(to bottom, #1e1b18 0%, transparent 20%);
+  pointer-events: none;
+} */
+
+.hero::after {
+  /* Brillo cálido general de válvula */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 75% 50%, rgba(209,92,59,0.12) 0%, transparent 60%);
   z-index: 1;
   pointer-events: none;
 }
-/* Diagrama de válvula decorativo */
-.hero::before {
-  content: '';
-  position: absolute;
-  right: -80px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 400px;
-  height: 700px;
-/*  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 350' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M100 20 L100 120 M70 40 L130 40 M70 60 L130 60 M70 80 L130 80 M80 120 L120 120 L110 150 L90 150 Z M100 150 L100 220 M75 180 L125 180 M85 200 L115 200 M80 220 L120 220 L100 280 Z' stroke='%23b1472b' stroke-width='2' fill='none' opacity='0.3'/%3E%3Ccircle cx='100' cy='60' r='12' stroke='%23b1472b' stroke-width='1.5' fill='none' opacity='0.2'/%3E%3Ccircle cx='100' cy='200' r='16' stroke='%23b1472b' stroke-width='1.5' fill='none' opacity='0.2'/%3E%3C/svg%3E"); */
-  background-repeat: no-repeat;
-  background-size: contain;
-  opacity: 0.25;
-  z-index: 0;
-  pointer-events: none;
-}
+
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 3; /* Siempre por encima de la imagen */
   max-width: 700px;
   padding: 3rem 2rem;
   text-align: left;
   color: #f0e7d8;
 }
+
 .hero h1 {
   font-family: var(--font-display);
   font-size: clamp(3.5rem, 10vw, 6rem);
@@ -244,6 +262,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   margin-bottom: 0.3em;
   letter-spacing: 1px;
 }
+
 .hero p {
   font-family: var(--font-mono);
   font-size: 1rem;
@@ -256,6 +275,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   border-left: 6px solid var(--rust);
   box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
 }
+
 .btn-primary {
   display: inline-block;
   background: var(--rust-bright);
@@ -274,6 +294,77 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   color: var(--ochre);
   border-color: #000;
   box-shadow: 6px 6px 0 var(--rust);
+}
+
+/* --- Imagen Atmosférica (La Magia) --- */
+.hero-image {
+  position: absolute;
+  top: 0;
+  right: -5%; /* La empujamos un poquito afuera para que el centro de la válvula quede mejor ubicado */
+  width: 60%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Acá borramos los bordes de la foto fundiéndolos con el #1e1b18 del fondo */
+.hero-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(to right, #1e1b18 0%, transparent 40%),  /* Borra el borde izquierdo */
+    linear-gradient(to top, #1e1b18 0%, transparent 15%),    /* Borra el borde inferior */
+    linear-gradient(to bottom, #1e1b18 0%, transparent 15%); /* Borra el borde superior */
+}
+
+/* Versión móvil: La imagen se va de fondo y se oscurece para no tapar el texto */
+/* Versión móvil: Apilamos imagen arriba y texto abajo, cero superposición */
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    padding-top: 88px; /* Respetamos el alto del nav */
+    min-height: auto;
+  }
+  .hero-image {
+    position: relative; /* La sacamos del fondo absoluto */
+    width: 100%;
+    height: 45vh; /* Ocupa casi la mitad de la pantalla */
+    min-height: 280px;
+    right: 0;
+    opacity: 1; /* 100% de visibilidad, la foto es la estrella */
+    order: -1; /* Fundamental: la manda arriba del texto */
+  }
+  /* Modificamos la máscara: ahora solo borramos el borde de abajo para que se funda con el fondo oscuro del texto */
+  .hero-image::after {
+    background: linear-gradient(to top, #1e1b18 0%, transparent 40%);
+  }
+  .hero-content {
+    padding: 0 1.5rem 4rem;
+    max-width: 100%;
+    text-align: center; /* En mobile el texto centrado queda mucho más firme */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero h1 {
+    font-size: 3.2rem;
+  }
+  .hero p {
+    border-left: none; /* Le sacamos la plomada izquierda */
+    border-bottom: 3px solid var(--rust); /* Le ponemos una base naranja para anclarlo visualmente */
+    padding: 1rem;
+    text-align: center;
+    box-shadow: none; /* Limpiamos el ruido visual */
+    background: transparent;
+  }
 }
 
 /* =====================================================
@@ -398,7 +489,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   margin: -2px 0 0 -2px;
   display: flex;
   flex-direction: column;
-  transition: all 0.25s;
+
   cursor: pointer;
   position: relative;
 }
@@ -424,11 +515,12 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s;
+  /* Combinamos zoom suave (0.8s) y opacidad rápida para el JS (0.15s) */
+  transition: transform 0.8s cubic-bezier(0.2, 0.9, 0.2, 1), filter 0.8s ease, opacity 0.15s ease-in-out;
   filter: sepia(15%) contrast(1.05);
 }
 .product-card:hover .product-img {
-  transform: scale(1.08);
+  transform: scale(1.05); /* Un poquito menos de escala para que no desentone con la caja */
   filter: sepia(5%) contrast(1.1);
 }
 
@@ -599,10 +691,10 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   padding: 1.5rem;
   border-right: 4px solid var(--ink);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column; /* Apilamos la grande y las chicas */
   background: var(--surface);
   position: relative;
+  gap: 1rem;
 }
 /* Cruces de registro (crop marks) */
 .modal-img-container::before, .modal-img-container::after {
@@ -611,12 +703,65 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 .modal-img-container::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
 .modal-img-container::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
 
-.modal-img {
+/* --- ESTILOS DEL COLLAGE VERTICAL --- */
+.modal-collage {
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  max-height: 500px;
-  filter: sepia(20%) contrast(1.1) grayscale(0.2);
+  height: 450px; /* Lienzo fijo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.collage-img {
+  position: absolute;
+  width: 60%; /* Un poquito más angostas para dar aire */
+  max-height: 250px;
+  object-fit: cover;
+  border: 4px solid var(--surface-alt);
+  box-shadow: 4px 4px 0 rgba(26,26,26,0.8);
+  filter: sepia(20%) contrast(1.05) grayscale(0.3);
+  transition: all 0.4s cubic-bezier(0.2, 0.9, 0.2, 1);
+  cursor: pointer;
+}
+
+/* Ubicación tipo polaroids dispersas - Superposición Mínima */
+.collage-img-0 { 
+  top: 0; /* Pegada arriba */
+  left: 2%; 
+  transform: rotate(-5deg); 
+  z-index: 1; 
+}
+.collage-img-1 { 
+  top: 50%; /* Justo en el medio vertical */
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(3deg); /* Centrado absoluto */
+  z-index: 2; 
+}
+.collage-img-2 { 
+  bottom: 0; /* Pegada abajo */
+  right: 2%; 
+  transform: rotate(-3deg); 
+  z-index: 3; 
+}
+
+/* Hover genérico: Enderezar y venir al frente */
+.collage-img:hover {
+  filter: sepia(0%) contrast(1.1) grayscale(0%);
+  z-index: 10;
+  box-shadow: 10px 10px 0 rgba(239, 123, 74, 0.6);
+  border-color: var(--ink);
+}
+
+/* Manejo de escala individual para que no se corten contra los bordes */
+.collage-img-0:hover, .collage-img-2:hover {
+  /* Escala sutil (1.1) y rotación cero */
+  transform: scale(1.1) rotate(0deg); 
+}
+
+/* La del medio tiene más aire, puede agrandarse más (1.15) pero hay que mantener el centrado */
+.collage-img-1:hover {
+  transform: translate(-50%, -50%) scale(1.15) rotate(0deg);
 }
 
 /* Cuerpo del plano */
@@ -841,6 +986,16 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   color: var(--ink);
   min-width: 80px;
   text-align: right;
+}
+/* --- QoL 2: Válvula Caliente --- */
+@keyframes tubePulse {
+  0% { box-shadow: 0 0 2px rgba(239, 123, 74, 0.4); border-color: var(--rust); }
+  50% { box-shadow: 0 0 12px rgba(239, 123, 74, 0.9); border-color: var(--ember); background: var(--rust); color: #fff;}
+  100% { box-shadow: 0 0 2px rgba(239, 123, 74, 0.4); border-color: var(--rust); }
+}
+
+.play-btn-custom.playing {
+  animation: tubePulse 2s infinite ease-in-out;
 }
 
 /* =====================================================
@@ -1106,6 +1261,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   font-size: 0.9rem;
   outline: none;
   transition: all 0.2s;
+  
 }
 .form-group input:focus,
 .form-group textarea:focus {
@@ -1210,13 +1366,19 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   transform: translateX(0);
 }
 
-.animate-in {
+/* --- QoL 1: Scroll Reveal --- */
+.product-card {
+  /* Al .product-card actual le vas a agregar estas 3 líneas para prepararlo */
   opacity: 0;
-  transform: translateY(10px);
-  animation: fadeUp 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+  transform: translateY(30px);
+  transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1), 
+              transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1),
+              box-shadow 0.25s, outline-color 0.25s;
 }
-@keyframes fadeUp {
-  to { opacity: 1; transform: translateY(0); }
+/* Esta es la clase que el JS le va a inyectar cuando lo mires */
+.product-card.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Feedback físico para móviles (sin hover) */
@@ -1321,13 +1483,42 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
     transform: scale(0.95);
   }
 
-  /* Achicamos la imagen para que no ocupe media pantalla */
+  /* Transformamos el collage en una tira horizontal para mobile */
   .modal-img-container {
     border-right: none;
     border-bottom: 4px solid var(--ink);
     padding: 1rem;
     min-height: auto;
-    height: 220px; 
+    height: auto; 
+  }
+  .modal-collage {
+    position: static;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 0.5rem;
+    gap: 1rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .modal-collage::-webkit-scrollbar { display: none; }
+  
+  .collage-img {
+    position: static; /* Matamos el absolute en cel */
+    width: 220px;
+    height: 180px;
+    flex-shrink: 0;
+    transform: none; /* Anulamos la rotación para no entorpecer el dedo */
+  }
+  /* Limpiamos las coordenadas del absoluto para que en mobile fluyan normal */
+  .collage-img-0, .collage-img-1, .collage-img-2 {
+    top: auto; left: auto; right: auto; bottom: auto;
+  }
+  
+  .collage-img:hover {
+    transform: scale(1.02); /* Escala mucho más sutil en celular */
   }
   
   /* Cajetín colapsado con espacio inteligente */

@@ -16,7 +16,7 @@ const localFallbackProducts = [
     "price": 2890,
     "description": "Combo de 5 watts con una sola válvula EL34. Sonido limpio y cristalino que se rompe con gracia al subir el volumen.",
     "specs": ["1× EL34", "Transformador Primus UK", "Caja de pino americano", "Reverb spring"],
-    "image": "./images/TASENCObk.webp",
+    "images": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": [
       { "name": "Clean (Neck)", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" },
@@ -30,7 +30,7 @@ const localFallbackProducts = [
     "price": 4290,
     "description": "La versión potente del Phoenix. Cuatro válvulas EL34 que ofrecen desde cleans cálidos hasta crunch clásico.",
     "specs": ["4× EL34", "Transformador Primus UK", "Caja de caoba", "Reverb spring + tremolo"],
-    "image": "./images/TASENCObk.webp",
+    "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": [
       { "name": "Clean Channel", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" },
@@ -44,7 +44,7 @@ const localFallbackProducts = [
     "price": 3650,
     "description": "Cabezal de tres canales con preamplificación híbrida. ECC83 + 6L6.",
     "specs": ["2× ECC83 + 2× 6L6", "Transformador Primus UK", "Caja de acero y madera", "3 canales independientes"],
-    "image": "./images/TASENCObk.webp",
+    "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": []
   }, 
@@ -55,7 +55,7 @@ const localFallbackProducts = [
     "price": 1950,
     "description": "Pequeño pero poderoso. Un solo EL84 que produce un sonido vintage inconfundible.",
     "specs": ["1× EL84", "Transformador Primus UK", "Caja de pino", "Puerto de altavoz 8"],
-    "image": "./images/TASENCObk.webp",
+    "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": [
       { "name": "Vintage Tone", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" }
@@ -68,7 +68,7 @@ const localFallbackProducts = [
     "price": 6490,
     "description": "Nuestro amplificador insignia. Cabecera y combo en caja de roble con 100W.",
     "specs": ["8× EL34", "Transformador Primus UK", "Caja de roble americano", "Cabina 2×12"],
-    "image": "./images/TASENCObk.webp",
+    "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": []
   }, 
@@ -79,7 +79,7 @@ const localFallbackProducts = [
     "price": 490,
     "description": "Pedal de delay analógico con válvula ECC83. Hasta 12 segundos de eco.",
     "specs": ["1× ECC83", "Circuito totalmente analógico", "Control de tempo, feedback y tone"],
-    "image": "./images/TASENCObk.webp",
+    "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": [
       { "name": "Slapback Delay", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
@@ -133,12 +133,14 @@ function renderProducts(filter) {
       p.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }
+  
+  // Limpiamos la clase 'animate-in' vieja del HTML
   document.getElementById('productGrid').innerHTML = filtered.map((p, i) => `
-    <div class="product-card animate-in ${p.featured ? 'featured' : ''}" style="animation-delay: ${i * 0.05}s" onclick="openModal(${p.id})">
+    <div class="product-card ${p.featured ? 'featured' : ''}" onclick="openModal(${p.id})" onmouseenter="startCardHover(${p.id})" onmouseleave="stopCardHover(${p.id})">
       <div class="product-img-wrapper">
         <div class="otk-badge">handmade</div>
         <div class="serial-stamp">NO. 000${p.id}</div>
-        <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy" />
+        <img class="product-img" id="card-img-${p.id}" src="${Array.isArray(p.images) ? p.images[0] : (Array.isArray(p.image) ? p.image[0] : (p.image || './images/TASENCObk.webp'))}" alt="${p.name}" loading="lazy" />
       </div>
       <div class="product-body">
         <span class="product-category">${p.category}</span>
@@ -159,6 +161,25 @@ function renderProducts(filter) {
       </div>
     </div>
   `).join('');
+
+  // Magia QoL: Intersection Observer
+  const cards = document.querySelectorAll('.product-card');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // Le damos un pequeño retraso en cascada (0ms, 100ms, 200ms...)
+        // basado en su posición en la grilla para que se vea escalonado
+        const delay = Array.from(cards).indexOf(entry.target) % 3 * 100;
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, delay);
+        // Una vez que apareció, dejamos de observarlo para no gastar CPU
+        observer.unobserve(entry.target); 
+      }
+    });
+  }, { threshold: 0.1 }); // El 10% del producto tiene que estar visible para que salte
+
+  cards.forEach(card => observer.observe(card));
 }
 
 function setFilter(cat) { activeFilter = cat; renderFilters(); renderProducts(cat); }
@@ -232,6 +253,7 @@ function loadTrack(url, btnNode) {
 }
 
 // Control maestro de Play/Pause
+// Control maestro de Play/Pause
 function togglePlay() {
   const btn = document.getElementById('playBtn');
   if (!audioPlayer.src || audioPlayer.src.endsWith('undefined')) return; 
@@ -240,10 +262,12 @@ function togglePlay() {
     audioPlayer.pause();
     isPlaying = false;
     btn.textContent = '▶';
+    btn.classList.remove('playing'); // Apagamos el brillo
   } else {
     audioPlayer.play().then(() => {
       isPlaying = true;
       btn.textContent = '❚❚';
+      btn.classList.add('playing'); // Prendemos la válvula
     }).catch(err => {
       showToast("Error al reproducir. Quizás el archivo dummy no existe.");
     });
@@ -261,10 +285,76 @@ function seekAudio(e) {
 }
 // ----------------------------------------------
 
+// --- LÓGICA DE CARRUSEL EN PRODUCT CARDS ---
+const hoverTimers = {};
+const hoverIndexes = {};
+
+window.startCardHover = function(id) {
+  const p = products.find(x => x.id === id);
+  let imgArray = [];
+  if (Array.isArray(p.images) && p.images.length > 0) imgArray = p.images;
+  else if (Array.isArray(p.image) && p.image.length > 0) imgArray = p.image;
+  
+  if (imgArray.length <= 1) return; // Si hay 1 sola foto, ni nos gastamos
+
+  const imgEl = document.getElementById(`card-img-${id}`);
+  hoverIndexes[id] = 0;
+
+  // Cambiamos de foto cada 1.2 segundos (1200ms)
+  hoverTimers[id] = setInterval(() => {
+    hoverIndexes[id] = (hoverIndexes[id] + 1) % imgArray.length;
+    
+    // Efecto de parpadeo suave al cambiar
+    imgEl.style.opacity = '0.7'; 
+    setTimeout(() => {
+      imgEl.src = imgArray[hoverIndexes[id]];
+      imgEl.style.opacity = '1';
+    }, 150);
+  }, 1200);
+}
+
+window.stopCardHover = function(id) {
+  if (hoverTimers[id]) {
+    clearInterval(hoverTimers[id]);
+    delete hoverTimers[id];
+    
+    // Restauramos la foto original al sacar el mouse
+    const p = products.find(x => x.id === id);
+    let imgArray = [];
+    if (Array.isArray(p.images) && p.images.length > 0) imgArray = p.images;
+    else if (Array.isArray(p.image) && p.image.length > 0) imgArray = p.image;
+    
+    const imgEl = document.getElementById(`card-img-${id}`);
+    if (imgEl && imgArray.length > 0) {
+      imgEl.src = imgArray[0];
+      imgEl.style.opacity = '1';
+    }
+  }
+}
+
 function openModal(id) {
   const p = products.find(x => x.id === id);
-  document.getElementById('modalImg').src = p.image;
-  document.getElementById('modalImg').alt = p.name;
+  
+  // Lógica a prueba de balas: agarramos el array de 'images', o de 'image' si le erraste al nombre en la BD, o armamos un array con el string suelto
+  let imgArray = [];
+  if (Array.isArray(p.images) && p.images.length > 0) imgArray = p.images;
+  else if (Array.isArray(p.image) && p.image.length > 0) imgArray = p.image;
+  else imgArray = [p.image || './images/TASENCObk.webp'];
+  
+  // Construimos el collage vertical (fotos apiladas tipo mesa de taller)
+  let galleryHTML = `<div class="modal-collage">`;
+  
+  // Si nos mandaste 20 fotos, agarramos solo las primeras 3 para el collage
+  const collageImages = imgArray.slice(0, 3);
+  
+  collageImages.forEach((src, index) => {
+    // Le asignamos una clase extra con el índice para rotarlas distinto en CSS
+    galleryHTML += `<img class="collage-img collage-img-${index}" src="${src}" alt="${p.name} - Vista ${index + 1}" />`;
+  });
+  
+  galleryHTML += `</div>`;
+  
+  document.getElementById('modalGalleryContainer').innerHTML = galleryHTML;
   
   // Paramos cualquier audio que haya quedado colgado del producto anterior y reseteamos
   audioPlayer.pause();
@@ -450,7 +540,7 @@ function renderCart() {
   summary.style.display = 'block';
   container.innerHTML = cart.map(item => `
     <div class="cart-item">
-      <img class="cart-item-img" src="${item.product.image}" alt="${item.product.name}" />
+      <img class="cart-item-img" src="${Array.isArray(item.product.images) ? item.product.images[0] : (Array.isArray(item.product.image) ? item.product.image[0] : (item.product.image || './images/TASENCObk.webp'))}" alt="${item.product.name}" />
       <div class="cart-item-info">
         <h3>${item.product.name}</h3>
         <p>USD ${item.product.price.toLocaleString()} c/u</p>
@@ -624,26 +714,41 @@ document.getElementById('searchInput').addEventListener('input', e => {
   renderProducts(activeFilter);
 });
 
+let lastScrollY = window.scrollY; // Variable para trackear hacia dónde vamos
+
 window.addEventListener('scroll', () => {
+  const nav = document.querySelector('.nav');
+  const currentScrollY = window.scrollY;
+
   // Cambio de fondo del nav al bajar
-  document.querySelector('.nav').classList.toggle('scrolled', window.scrollY > 20);
+  if (currentScrollY > 20) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+
+  // --- QoL: Smart Nav (Ocultar al bajar, mostrar al subir) ---
+  if (currentScrollY > lastScrollY && currentScrollY > 100) {
+    nav.classList.add('nav-hidden'); // Usuario bajando -> escondemos
+  } else {
+    nav.classList.remove('nav-hidden'); // Usuario subiendo -> mostramos
+  }
+  lastScrollY = currentScrollY;
+  // ------------------------------------------------------------
 
   // Lógica del Scrollspy: iluminar el nav según la sección
   let current = '';
   const sections = document.querySelectorAll('section[id]');
-  // Calculamos el desfase leyendo directamente la regla del CSS
   const scrollPadding = parseInt(getComputedStyle(document.documentElement).scrollPaddingTop, 10) || 91;
-  const offset = scrollPadding + 10; // +10px de margen de seguridad
+  const offset = scrollPadding + 10;
 
   sections.forEach(section => {
     const sectionTop = section.offsetTop - offset;
-    // Si la pantalla bajó más allá del inicio de esta sección, guardamos su ID
-    if (window.scrollY >= sectionTop) {
+    if (currentScrollY >= sectionTop) {
       current = section.getAttribute('id');
     }
   });
 
-  // Limpiamos todos los links y prendemos solo el que coincide con la sección actual
   document.querySelectorAll('.nav-links a').forEach(a => {
     a.classList.remove('active');
     if (a.getAttribute('href') === `#${current}`) {
@@ -660,3 +765,14 @@ document.addEventListener('keydown', e => {
     closeCart();
   }
 });
+
+// --- QoL 3: Auto-resize del mensaje de contacto ---
+const textarea = document.getElementById('contactMessage');
+if (textarea) {
+  textarea.addEventListener('input', function() {
+    // Reseteamos la altura para recalcular correctamente si borra texto
+    this.style.height = 'auto'; 
+    // Le asignamos la altura del contenido real + unos píxeles de margen
+    this.style.height = (this.scrollHeight + 5) + 'px';
+  });
+}
