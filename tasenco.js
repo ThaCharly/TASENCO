@@ -1,10 +1,91 @@
 // Arrancamos con el catálogo vacío. Ya no es 'const', es 'let' porque se va a llenar dinámicamente.
+// Arrancamos con el catálogo vacío.
 let products = []; 
 let cart = JSON.parse(localStorage.getItem('TASENCO-cart') || '[]');
 let discountPercent = 0;
 let activeFilter = 'Todos';
 let searchQuery = '';
-let categories = ['Todos']; // Esto también se va a poblar dinámicamente
+let categories = ['Todos'];
+
+// Catálogo de contingencia (Hardcodeado para testing)
+const localFallbackProducts = [
+  {
+    "id": 1,
+    "name": "PHOENIX-5W",
+    "category": "Combo",
+    "price": 2890,
+    "description": "Combo de 5 watts con una sola válvula EL34. Sonido limpio y cristalino que se rompe con gracia al subir el volumen.",
+    "specs": ["1× EL34", "Transformador Primus UK", "Caja de pino americano", "Reverb spring"],
+    "image": "./images/TASENCObk.webp",
+    "featured": false,
+    "audio": [
+      { "name": "Clean (Neck)", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" },
+      { "name": "Crunch (Bridge)", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "PHOENIX-50W",
+    "category": "Combo",
+    "price": 4290,
+    "description": "La versión potente del Phoenix. Cuatro válvulas EL34 que ofrecen desde cleans cálidos hasta crunch clásico.",
+    "specs": ["4× EL34", "Transformador Primus UK", "Caja de caoba", "Reverb spring + tremolo"],
+    "image": "./images/TASENCObk.webp",
+    "featured": false,
+    "audio": [
+      { "name": "Clean Channel", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" },
+      { "name": "Drive Channel", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "ATLAS-Cabezal",
+    "category": "Cabezal",
+    "price": 3650,
+    "description": "Cabezal de tres canales con preamplificación híbrida. ECC83 + 6L6.",
+    "specs": ["2× ECC83 + 2× 6L6", "Transformador Primus UK", "Caja de acero y madera", "3 canales independientes"],
+    "image": "./images/TASENCObk.webp",
+    "featured": false,
+    "audio": []
+  }, 
+  {
+    "id": 4,
+    "name": "LUNA-MINI",
+    "category": "Combo",
+    "price": 1950,
+    "description": "Pequeño pero poderoso. Un solo EL84 que produce un sonido vintage inconfundible.",
+    "specs": ["1× EL84", "Transformador Primus UK", "Caja de pino", "Puerto de altavoz 8"],
+    "image": "./images/TASENCObk.webp",
+    "featured": false,
+    "audio": [
+      { "name": "Vintage Tone", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" }
+    ]
+  }, 
+  {
+    "id": 5,
+    "name": "TITAN-Stack",
+    "category": "Cabezal y caja",
+    "price": 6490,
+    "description": "Nuestro amplificador insignia. Cabecera y combo en caja de roble con 100W.",
+    "specs": ["8× EL34", "Transformador Primus UK", "Caja de roble americano", "Cabina 2×12"],
+    "image": "./images/TASENCObk.webp",
+    "featured": false,
+    "audio": []
+  }, 
+  {
+    "id": 6,
+    "name": "ECHO-PDL",
+    "category": "Pedales",
+    "price": 490,
+    "description": "Pedal de delay analógico con válvula ECC83. Hasta 12 segundos de eco.",
+    "specs": ["1× ECC83", "Circuito totalmente analógico", "Control de tempo, feedback y tone"],
+    "image": "./images/TASENCObk.webp",
+    "featured": false,
+    "audio": [
+      { "name": "Slapback Delay", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
+    ]
+  }
+];
 
 // --- LÓGICA DE CONEXIÓN CON EL BACKEND C++ ---
 async function bootCatalog() {
@@ -19,24 +100,23 @@ async function bootCatalog() {
     // Volcamos la memoria de C++ en nuestra variable de JS
     products = await response.json();
     
-    // Ahora que tenemos los datos, extraemos las categorías únicas
-    categories = ['Todos', ...new Set(products.map(p => p.category))];
-    
-    // Encendemos la interfaz
-    renderFilters();
-    renderProducts('Todos');
-    
   } catch (error) {
-    console.error("[FALLO DE SISTEMA] No se pudo conectar al servidor:", error);
-    // Si el backend está apagado, mostramos un error técnico en pantalla
-    document.getElementById('productGrid').innerHTML = `
-      <div style="grid-column: 1/-1; padding: 3rem; border: 2px dashed var(--rust); background: var(--surface-alt); text-align: center;">
-        <h3 style="font-family: var(--font-techno); color: var(--rust); font-size: 1.5rem; margin-bottom: 1rem;">[ERROR DE ENLACE]</h3>
-        <p style="font-family: var(--font-mono); font-size: 0.9rem;">No hay respuesta del servidor central (localhost:8080).</p>
-        <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem;">Verificá que el ejecutable de C++ esté corriendo.</p>
-      </div>
-    `;
+    console.warn("[FALLO DE SISTEMA] No se pudo conectar al servidor C++:", error);
+    console.warn("[CONTINGENCIA] Levantando catálogo local de pruebas...");
+    
+    // Activamos el modo supervivencia
+    products = localFallbackProducts;
+    
+    // Un toast para que te enteres que no estás leyendo de la API
+    setTimeout(() => {
+      showToast("Modo Offline: Catálogo local cargado.");
+    }, 500);
   }
+
+  // Sin importar de dónde sacamos la info, armamos el frontend
+  categories = ['Todos', ...new Set(products.map(p => p.category))];
+  renderFilters();
+  renderProducts('Todos');
 }
 
 function renderFilters() {
