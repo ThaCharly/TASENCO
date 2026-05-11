@@ -520,8 +520,53 @@ function showToast(msg) {
   t.textContent = msg;
   document.getElementById('toastContainer').appendChild(t);
   requestAnimationFrame(() => t.classList.add('show'));
-  setTimeout(() => { t.classList.remove('show'); }, 4000);
-  setTimeout(() => t.remove(), 4400);
+  
+  // Temporizadores originales
+  let hideTimeout = setTimeout(() => { t.classList.remove('show'); }, 4000);
+  let removeTimeout = setTimeout(() => t.remove(), 4400);
+
+  // --- LÓGICA DE SWIPE (Deslizar para descartar) ---
+  let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+
+  t.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    startX = e.clientX;
+    t.style.transition = 'none'; // Desactivar la transición para que siga al dedo instantáneamente
+    clearTimeout(hideTimeout);   // Pausar el auto-ocultado mientras lo tenés agarrado
+    clearTimeout(removeTimeout);
+    t.setPointerCapture(e.pointerId);
+  });
+
+  t.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    currentX = e.clientX - startX;
+    // Permitimos deslizar en ambas direcciones
+    t.style.transform = `translateX(${currentX}px)`;
+    t.style.opacity = 1 - (Math.abs(currentX) / 250); 
+  });
+
+  t.addEventListener('pointerup', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    t.style.transition = 'transform 0.3s, opacity 0.3s'; // Reactivar transición
+    t.releasePointerCapture(e.pointerId);
+
+    if (Math.abs(currentX) > 60) {
+      // Si lo deslizó más de 60px de recorrido, lo matamos
+      const direction = currentX > 0 ? '120%' : '-120%';
+      t.style.transform = `translateX(${direction})`;
+      t.style.opacity = 0;
+      setTimeout(() => t.remove(), 300);
+    } else {
+      // Si fue un toque sin querer, el resorte lo vuelve a su lugar y reinicia el timer
+      t.style.transform = '';
+      t.style.opacity = '';
+      hideTimeout = setTimeout(() => { t.classList.remove('show'); }, 4000);
+      removeTimeout = setTimeout(() => t.remove(), 4400);
+    }
+  });
 }
 
 async function handleContact(e) {

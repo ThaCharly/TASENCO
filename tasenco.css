@@ -1197,7 +1197,14 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   border: 2px solid var(--rust-bright);
   box-shadow: 4px 4px 0 var(--olive);
   transform: translateX(120%);
-  transition: 0.3s;
+  transition: transform 0.3s, opacity 0.3s;
+  /* Optimizaciones para detectar el dedo/mouse sin romper el scroll de la página */
+  touch-action: pan-y; 
+  user-select: none;
+  cursor: grab;
+}
+.toast:active {
+  cursor: grabbing;
 }
 .toast.show {
   transform: translateX(0);
