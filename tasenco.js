@@ -452,7 +452,11 @@ function applyPromo() {
   if (code === 'TUBE10') {
     discountPercent = 0.1;
     messageEl.textContent = 'Código aplicado: 10% de descuento';
-  } else {
+  } else if (code === 'TUBE50') {
+    discountPercent = 0.5;
+    messageEl.textContent = 'Código aplicado: 20% de descuento';
+   }
+  else {
     discountPercent = 0;
     messageEl.textContent = 'Código inválido';
   }
