@@ -69,7 +69,7 @@ const localFallbackProducts = [
     "description": "Nuestro amplificador insignia. Cabecera y combo en caja de roble con 100W.",
     "specs": ["8× EL34", "Caja de roble americano", "Cabina 2×12"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
-    "featured": true,
+    "featured": false,
     "audio": []
   },
   {
@@ -529,7 +529,7 @@ function getShippingCost() {
   const shippingRadio = document.querySelector('input[name="shipping"]:checked');
   if (!shippingRadio) return 15;
   let cost = parseFloat(shippingRadio.value);
-  if (cost === 15 && subtotal > 3000) {
+  if (cost === 15 && subtotal > 1500) {
     cost = 0;
   }
   return cost;
@@ -549,7 +549,7 @@ function updateCartSummary() {
     document.getElementById('discountRow').style.display = 'none';
   }
   
-  if (shipping === 0 && subtotal > 3000) {
+  if (shipping === 0 && subtotal > 1500) {
     document.getElementById('shippingDisplay').innerHTML = `<span style="color:var(--rust-bright); font-weight:700;">¡GRATIS!</span>`;
   } else {
     document.getElementById('shippingDisplay').textContent = `USD ${shipping.toLocaleString()}`;
