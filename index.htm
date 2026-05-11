@@ -63,7 +63,9 @@
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal" id="modalContent">
       <button class="modal-close" onclick="closeModal()">✕</button>
-      <img class="modal-img" id="modalImg" src="" alt="" />
+      <div class="modal-img-container">
+        <img class="modal-img" id="modalImg" src="" alt="" />
+      </div>
       <div class="modal-body" id="modalBody"></div>
     </div>
   </div>
@@ -89,8 +91,8 @@
           <div class="cart-summary-row cart-total"><span>Total</span><span id="totalDisplay">USD 0</span></div>
         </div>
         <div class="cart-promo">
-          <label for="promoCode">Código de promoción</label>
-          <input type="text" id="promoCode" placeholder="Ej: TUBE10" />
+          <label for="promoCode">Código de promoción <span style="font-size:0.7rem; color:var(--muted); cursor:help; border-bottom: 1px dotted var(--muted);" title="Preguntanos por códigos en lanzamientos">[?]</span></label>
+          <input type="text" id="promoCode" placeholder="Ej: TUBE50" />
           <button onclick="applyPromo()">Aplicar</button>
           <span id="promoMessage" style="font-family: var(--font-mono); font-size:0.8rem; color: var(--rust); display:block; margin-top:0.3rem;"></span>
         </div>

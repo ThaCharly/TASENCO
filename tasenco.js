@@ -137,7 +137,7 @@ function renderProducts(filter) {
     <div class="product-card animate-in ${p.featured ? 'featured' : ''}" style="animation-delay: ${i * 0.05}s" onclick="openModal(${p.id})">
       <div class="product-img-wrapper">
         <div class="otk-badge">handmade</div>
-        <div class="serial-stamp">NO. 000${p.id}7</div>
+        <div class="serial-stamp">NO. 000${p.id}</div>
         <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy" />
       </div>
       <div class="product-body">
@@ -195,20 +195,39 @@ function formatTime(seconds) {
 
 // Función que dispara los tracks cuando tocan los botones
 function loadTrack(url, btnNode) {
-  document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
-  if (btnNode) btnNode.classList.add('active');
+  // Deshabilitamos temporalmente para dar feedback de carga
+  const allBtns = document.querySelectorAll('.track-btn');
+  allBtns.forEach(b => {
+    b.classList.remove('active');
+    b.disabled = true;
+    b.style.opacity = '0.5';
+  });
   
-  const wasPlaying = isPlaying;
-  audioPlayer.src = url;
-  audioPlayer.load();
-  
-  if (wasPlaying) {
-    audioPlayer.play().catch(e => console.log('Esperando interacción...'));
-  } else {
-    const fill = document.getElementById('progressFill');
-    const timeDisp = document.getElementById('timeDisplay');
-    if(fill) fill.style.width = '0%';
-    if(timeDisp) timeDisp.textContent = '0:00 / 0:00';
+  if (btnNode) {
+    btnNode.classList.add('active');
+    // Mini feedback técnico mientras carga
+    const oldText = btnNode.textContent;
+    btnNode.textContent = '[...] ' + oldText;
+    
+    isPlaying = false; // Forzamos apagado para no arrastrar fantasmas
+    audioPlayer.src = url;
+    audioPlayer.load();
+    
+    // Autoplay directo al hacer clic (lo que la gente espera)
+    audioPlayer.play().then(() => {
+      isPlaying = true;
+      const playBtn = document.getElementById('playBtn');
+      if (playBtn) playBtn.textContent = '❚❚';
+    }).catch(e => {
+      console.log('Esperando interacción...', e);
+    }).finally(() => {
+      // Restauramos los botones al arrancar
+      allBtns.forEach(b => {
+        b.disabled = false;
+        b.style.opacity = '1';
+      });
+      btnNode.textContent = oldText;
+    });
   }
 }
 
@@ -247,14 +266,15 @@ function openModal(id) {
   document.getElementById('modalImg').src = p.image;
   document.getElementById('modalImg').alt = p.name;
   
-  // Envolvemos la imagen en su contenedor técnico
-  const imgElement = document.getElementById('modalImg');
-  if (!imgElement.parentElement.classList.contains('modal-img-container')) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'modal-img-container';
-    imgElement.parentNode.insertBefore(wrapper, imgElement);
-    wrapper.appendChild(imgElement);
-  }
+  // Paramos cualquier audio que haya quedado colgado del producto anterior y reseteamos
+  audioPlayer.pause();
+  audioPlayer.currentTime = 0;
+  isPlaying = false;
+  
+  const fakeFill = document.getElementById('progressFill');
+  if (fakeFill) fakeFill.style.width = '0%';
+  const timeDisp = document.getElementById('timeDisplay');
+  if (timeDisp) timeDisp.textContent = '0:00 / 0:00';
 
   // Armamos la sección de audios con estética de diagnóstico
   let audioHTML = '';
@@ -352,6 +372,13 @@ function addToCart(productId) {
     cart.push({ product, quantity: 1 });
   }
   saveCart();
+  
+  const countSpan = document.getElementById('cartCount');
+  if (countSpan) {
+    countSpan.style.transform = 'scale(1.4)';
+    setTimeout(() => { countSpan.style.transform = ''; }, 200);
+  }
+  
   showToast(`${product.name} añadido al carrito`);
 }
 
@@ -400,7 +427,13 @@ function updateCartSummary() {
   } else {
     document.getElementById('discountRow').style.display = 'none';
   }
-  document.getElementById('shippingDisplay').textContent = `USD ${shipping.toLocaleString()}`;
+  
+  if (shipping === 0 && subtotal > 3000) {
+    document.getElementById('shippingDisplay').innerHTML = `<span style="color:var(--rust-bright); font-weight:700;">¡GRATIS!</span>`;
+  } else {
+    document.getElementById('shippingDisplay').textContent = `USD ${shipping.toLocaleString()}`;
+  }
+  
   document.getElementById('totalDisplay').textContent = `USD ${total.toLocaleString()}`;
 }
 
@@ -487,8 +520,8 @@ function showToast(msg) {
   t.textContent = msg;
   document.getElementById('toastContainer').appendChild(t);
   requestAnimationFrame(() => t.classList.add('show'));
-  setTimeout(() => { t.classList.remove('show'); }, 3000);
-  setTimeout(() => t.remove(), 3400);
+  setTimeout(() => { t.classList.remove('show'); }, 4000);
+  setTimeout(() => t.remove(), 4400);
 }
 
 async function handleContact(e) {
@@ -553,8 +586,9 @@ window.addEventListener('scroll', () => {
   // Lógica del Scrollspy: iluminar el nav según la sección
   let current = '';
   const sections = document.querySelectorAll('section[id]');
-  // Calculamos el desfase dinámico (los mismos píxeles que le pusimos al CSS de scroll-padding)
-  const offset = window.innerWidth <= 768 ? 120 : 95;
+  // Calculamos el desfase leyendo directamente la regla del CSS
+  const scrollPadding = parseInt(getComputedStyle(document.documentElement).scrollPaddingTop, 10) || 91;
+  const offset = scrollPadding + 10; // +10px de margen de seguridad
 
   sections.forEach(section => {
     const sectionTop = section.offsetTop - offset;

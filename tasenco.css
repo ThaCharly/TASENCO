@@ -72,6 +72,11 @@ button {
   background: none;
 }
 
+:focus-visible {
+  outline: 3px solid var(--rust);
+  outline-offset: 2px;
+}
+
 .container {
   max-width: 1300px;
   margin: 0 auto;
@@ -178,6 +183,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   align-items: center;
   justify-content: center;
   border: 2px solid #1a1a1a;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* =====================================================
@@ -1198,12 +1204,25 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 }
 
 .animate-in {
-  animation: simpleAppear 0.5s ease forwards;
   opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
 }
-@keyframes simpleAppear {
-  to {
-    opacity: 1;
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Feedback físico para móviles (sin hover) */
+@media (hover: none) {
+  .product-card:active {
+    transform: scale(0.98);
+    background: var(--surface-alt);
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.15);
+  }
+  .add-btn:active, .qty-btn:active, .cart-btn:active {
+    transform: scale(0.95);
+    background: var(--rust-bright);
+    color: #fff;
   }
 }
 
@@ -1249,6 +1268,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
     padding-bottom: 5px;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    scroll-behavior: smooth;
   }
   .filter-bar::-webkit-scrollbar { display: none; }
   .filter-btn { flex-shrink: 0; }
