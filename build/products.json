@@ -59,7 +59,7 @@
   "description": "Nuestro amplificador insignia. Cabecera y combo en caja de roble con 100W.",
   "specs": ["8× EL34", "Transformador Primus UK", "Caja de roble americano", "Cabina 2×12"],
   "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
-  "featured": false,
+  "featured": true,
   "audio": []
 }, 
 {

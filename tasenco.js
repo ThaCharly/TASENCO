@@ -31,7 +31,7 @@ const localFallbackProducts = [
     "description": "La versión potente del Phoenix. Cuatro válvulas EL34 que ofrecen desde cleans cálidos hasta crunch clásico.",
     "specs": ["4× EL34", "Transformador Primus UK", "Caja de caoba", "Reverb spring + tremolo"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
-    "featured": false,
+    "featured": true,
     "audio": [
       { "name": "Clean Channel", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" },
       { "name": "Drive Channel", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
@@ -348,8 +348,8 @@ function openModal(id) {
   const collageImages = imgArray.slice(0, 3);
   
   collageImages.forEach((src, index) => {
-    // Le asignamos una clase extra con el índice para rotarlas distinto en CSS
-    galleryHTML += `<img class="collage-img collage-img-${index}" src="${src}" alt="${p.name} - Vista ${index + 1}" />`;
+    // Agregamos el evento onclick llamando a la nueva función de Lightbox
+    galleryHTML += `<img class="collage-img collage-img-${index}" src="${src}" alt="${p.name} - Vista ${index + 1}" onclick="openLightbox('${src}')" />`;
   });
   
   galleryHTML += `</div>`;
@@ -442,6 +442,37 @@ function closeModal() {
   if(btn) btn.textContent = '▶';
 }
 document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+// --- LÓGICA DEL LIGHTBOX (Modo Inspección Visual) ---
+function openLightbox(src) {
+  let lb = document.getElementById('lightboxOverlay');
+  if (!lb) {
+    // Creamos el nodo dinámicamente la primera vez que se usa para no ensuciar el HTML
+    lb = document.createElement('div');
+    lb.id = 'lightboxOverlay';
+    lb.className = 'lightbox-overlay';
+    lb.innerHTML = `
+      <div class="lightbox-close" onclick="closeLightbox()">×</div>
+      <img class="lightbox-img" id="lightboxImg" src="" alt="Vista en detalle" />
+    `;
+    document.body.appendChild(lb);
+    // Cerrar si se hace click en el fondo oscuro
+    lb.addEventListener('click', e => { if(e.target === lb) closeLightbox(); });
+  }
+  
+  const imgEl = document.getElementById('lightboxImg');
+  imgEl.src = src;
+  
+  // Forzamos un reflow para que la animación salte limpia desde cero
+  void lb.offsetWidth;
+  lb.classList.add('open');
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('lightboxOverlay');
+  if (lb) lb.classList.remove('open');
+}
+// ----------------------------------------------------
 
 function saveCart() {
   localStorage.setItem('TASENCO-cart', JSON.stringify(cart));
@@ -728,12 +759,21 @@ window.addEventListener('scroll', () => {
   }
 
   // --- QoL: Smart Nav (Ocultar al bajar, mostrar al subir) ---
-  if (currentScrollY > lastScrollY && currentScrollY > 100) {
-    nav.classList.add('nav-hidden'); // Usuario bajando -> escondemos
-  } else {
-    nav.classList.remove('nav-hidden'); // Usuario subiendo -> mostramos
+  const delta = 90; // SENSITIVIDAD: Píxeles que hay que scrollear de un tirón para que accione.
+  const techo = window.innerWidth <= 768 ? 690 : 990; // LÍMITE: Píxeles desde arriba donde la barra nunca se esconde.
+
+  // Solo evaluamos esconder/mostrar si el recorrido es mayor a nuestro umbral de tolerancia
+  if (Math.abs(currentScrollY - lastScrollY) > delta) {
+    
+    if (currentScrollY > lastScrollY && currentScrollY > techo) {
+      nav.classList.add('nav-hidden'); // Bajó con ganas y pasó el techo -> Escondemos
+    } else {
+      nav.classList.remove('nav-hidden'); // Subió con ganas o está en el techo -> Mostramos
+    }
+    
+    // Solo actualizamos la última posición si realmente superamos el umbral
+    lastScrollY = currentScrollY; 
   }
-  lastScrollY = currentScrollY;
   // ------------------------------------------------------------
 
   // Lógica del Scrollspy: iluminar el nav según la sección
@@ -761,8 +801,16 @@ window.addEventListener('scroll', () => {
 window.dispatchEvent(new Event('scroll'));
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    closeModal();
-    closeCart();
+    // Chequeamos capas de profundidad: 
+    // Si el lightbox está abierto, matamos SOLO el lightbox.
+    const lb = document.getElementById('lightboxOverlay');
+    if (lb && lb.classList.contains('open')) {
+      closeLightbox();
+    } else {
+      // Si no, cerramos lo que haya abajo (modal normal o carrito)
+      closeModal();
+      closeCart();
+    }
   }
 });
 
