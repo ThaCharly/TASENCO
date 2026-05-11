@@ -454,7 +454,7 @@ function applyPromo() {
     messageEl.textContent = 'Código aplicado: 10% de descuento';
   } else if (code === 'TUBE50') {
     discountPercent = 0.5;
-    messageEl.textContent = 'Código aplicado: 20% de descuento';
+    messageEl.textContent = 'Código aplicado: 50% de descuento';
    }
   else {
     discountPercent = 0;
