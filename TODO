@@ -88,3 +88,27 @@ container.innerHTML = `
   </div>`;
 
 Con esto, pasás de un prototipo a un sistema robusto, listo para recibir tráfico real sin transpirar.
+
+1. El "Showcase" de Featured Amplificadores (Adiós, Tarjetas Gigantes)
+
+Vamos a crear una sección dedicada solo a tus joyas, justo después del Hero. En lugar de tarjetas gigantes y toscas, pensá en una experiencia inmersiva:
+
+    El Carousel Cinemático: Imaginate una barra deslizante, pero elegante. Una imagen de ultra alta resolución de un amplificador featured a la vez. Cuando pasás de uno a otro, el fondo (quizás una textura de taller oscurecida o una pared de ladrillos) cambia suavemente, como si estuvieras recorriendo el taller. El texto de descripción es minimalista y aparece con una animación sutil. El botón no dice "Añadir al Carrito", dice "Explorar la Obra". Es un cambio de mentalidad: de producto a pieza de arte.
+
+    La Vitrina de Componentes: Mostrá el ampli featured en primer plano, pero al lado, hacé zoom dinámico en sus componentes estrella: el transformador bobinado a mano o esa válvula NOS rara. Es como decir: "Mirá por qué este ampli es especial".
+
+    Contraste Industrial: Usá el carousel para jugar con la estética. Podés tener un ampli Combo en un entorno de estudio impecable, y el siguiente, un Cabezal, sobre una caja de transporte curtida. Eso rompe la monotonía y le da carácter.
+
+2. Controles de Tienda con Alma de Taller (Ordenando el Caos)
+
+Para que el cliente encuentre su sonido ideal sin volverse loco, necesitamos herramientas de orden, pero integradas en tu diseño:
+
+    El Dropdown de "Sintonizado": Un menú desplegable para ordenar. No lo llames "Ordenar por"; llamalo "Sintonizar por:". Las opciones serían: "Precio: Mayor" y "Precio: Menor" (básico), pero agregá algo con onda, como "Más Reciente" o "Joyas NOS". El diseño del menú debe ser limpio, con la tipografía Oswald y un sutil borde naranja al seleccionarlo.
+
+    Filtros de Taller: Al lado de los filtros actuales de "Combo/Cabezal", podés agregar filtros sutiles. Un icono de una válvula para elegir por potencia (ej: <15W, 15-50W, >50W). Y quizás un interruptor tipo toggle vintage para activar/desactivar "Mostrar solo en Stock".
+
+    Grilla Unificada: Los product cards regulares deben ser idénticos entre sí, limpios y cuadrados, como los gabinetes de los amplis. El aire que les dimos entre sí es sagrado. La diversidad visual la logramos con el parche OTK y, si querés, un hover que muestre los componentes internos como una transparencia.
+
+3. La Tipografía y el Color como Herramientas (Detalles que Suman)
+
+Usá tus fuentes actuales para definir jerarquías. El precio de los Featured debería ser más prominente, quizás con la fuente Rubik Mono One (la de los sellos) para que se sienta como un precio "grabado". El resto de los precios en la grilla sigue con Space Mono. Mantené tu paleta de colores: el naranja de válvula caliente (--ember) para las acciones principales y el óxido (--rust) para acentos sutiles, pero siempre sobre ese fondo de papel rugoso que nos da la textura.

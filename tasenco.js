@@ -115,9 +115,157 @@ async function bootCatalog() {
 
   // Sin importar de dónde sacamos la info, armamos el frontend
   categories = ['Todos', ...new Set(products.map(p => p.category))];
+  renderFeaturedShelf(); // <--- Función de Shelf Integrado
   renderFilters();
   renderProducts('Todos');
 }
+
+// =====================================================
+// OBRAS MAESTRAS (Carrusel de Destacados Integrado)
+// =====================================================
+// =====================================================
+// OBRAS CUMBRES (Carrusel Finito Elegante)
+// =====================================================
+let autoScrollTimer;
+
+function renderFeaturedShelf() {
+  const featured = products.filter(p => p.featured);
+  const grid = document.getElementById('featuredShelfGrid');
+  const section = document.getElementById('destacados');
+
+  if (featured.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+
+  // Ya no triplicamos nada, inyectamos los productos limpios y reales
+  grid.innerHTML = featured.map(p => `
+    <div class="shelf-item" onclick="openModal(${p.id})">
+      <div class="shelf-img-wrapper">
+        <img src="${Array.isArray(p.images) ? p.images[0] : (Array.isArray(p.image) ? p.image[0] : (p.image || './images/TASENCObk.webp'))}" alt="${p.name}" />
+      </div>
+      <div class="shelf-content">
+        <h3 class="shelf-item-title">${p.name}</h3>
+        <span class="shelf-item-category">${p.category}</span>
+        <p class="shelf-item-desc">${p.description}</p>
+        <div class="shelf-footer">
+          <span class="shelf-price">USD ${p.price.toLocaleString()}</span>
+          <a href="producto.html?id=${p.id}" class="shelf-btn" onclick="event.stopPropagation();">Explorar la Obra →</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  const controls = document.querySelector('.shelf-controls');
+
+  if (featured.length <= 1) {
+    if(controls) controls.style.display = 'none';
+    grid.style.justifyContent = 'center';
+    stopAutoScroll();
+  } else {
+    if(controls) controls.style.display = 'flex';
+    grid.style.justifyContent = 'flex-start';
+
+    // Arrancamos el motor automático
+    startAutoScroll();
+
+    // Detenemos el auto-scroll si el usuario interactúa para no sacarle la lectura
+    grid.addEventListener('mouseenter', stopAutoScroll);
+    grid.addEventListener('mouseleave', startAutoScroll);
+    grid.addEventListener('touchstart', stopAutoScroll, {passive: true});
+    grid.addEventListener('touchend', startAutoScroll, {passive: true});
+
+    // Arrancamos el Motor 3D Coverflow
+    grid.addEventListener('scroll', updateCoverflow);
+    window.addEventListener('resize', updateCoverflow);
+    setTimeout(updateCoverflow, 100); 
+  }
+}
+
+function updateCoverflow() {
+  const grid = document.getElementById('featuredShelfGrid');
+  if (!grid) return;
+
+  // Si bajamos a celular, matamos los cálculos 3D para ahorrar batería y limpiar estilos residuales
+  if (window.innerWidth <= 600) {
+    grid.querySelectorAll('.shelf-item').forEach(item => {
+      item.style.transform = '';
+      item.style.opacity = '';
+      item.style.zIndex = '';
+    });
+    return;
+  }
+
+  // Usamos matemática pura de layout (offsetLeft/scrollLeft) para ignorar la distorsión del 3D
+  const gridCenter = grid.scrollLeft + (grid.clientWidth / 2);
+
+  grid.querySelectorAll('.shelf-item').forEach(item => {
+    // El centro exacto de la tarjeta en el espacio real, sin importar su profundidad Z
+    const itemCenter = item.offsetLeft + (item.offsetWidth / 2);
+    const distance = itemCenter - gridCenter;
+
+    // Normalizamos la distancia matemática (de -1 a 1)
+    let ratio = distance / (grid.clientWidth / 2);
+    ratio = Math.max(-1, Math.min(1, ratio));
+
+    // Geometría 3D Plana: Escala, Hundimiento recto y Opacidad
+    const scale = 1 - Math.abs(ratio) * 0.12; 
+    const z = Math.abs(ratio) * -200; 
+    const opacity = 1 - Math.abs(ratio) * 0.35; 
+    
+    item.style.transform = `translateZ(${z}px) scale(${scale})`;
+    item.style.zIndex = Math.round(100 - Math.abs(ratio) * 10);
+    item.style.opacity = opacity;
+  });
+}
+
+function startAutoScroll() {
+  stopAutoScroll();
+  autoScrollTimer = setInterval(() => {
+    scrollShelf(1);
+  }, 4500); // 4.5 segundos, buen ritmo
+}
+
+function stopAutoScroll() {
+  if (autoScrollTimer) clearInterval(autoScrollTimer);
+}
+
+function scrollShelf(direction) {
+  const grid = document.getElementById('featuredShelfGrid');
+  const items = Array.from(grid.querySelectorAll('.shelf-item'));
+  if (items.length === 0) return;
+  
+  const gridCenter = grid.scrollLeft + (grid.clientWidth / 2);
+  
+  let closestIndex = 0;
+  let minDistance = Infinity;
+  
+  items.forEach((item, index) => {
+    const itemCenter = item.offsetLeft + (item.offsetWidth / 2);
+    const distance = Math.abs(itemCenter - gridCenter);
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestIndex = index;
+    }
+  });
+  
+  let targetIndex = closestIndex + direction;
+  
+  if (targetIndex < 0) {
+    targetIndex = items.length - 1;
+  } else if (targetIndex >= items.length) {
+    targetIndex = 0;
+  }
+  
+  const targetItem = items[targetIndex];
+  
+  // Usamos el API nativo de centrado para que el navegador resuelva el cálculo sin pelear con el scroll-snap del CSS
+  targetItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  
+  startAutoScroll();
+} 
 
 function renderFilters() {
   document.getElementById('filterBar').innerHTML = categories.map(cat =>
@@ -126,7 +274,9 @@ function renderFilters() {
 }
 
 function renderProducts(filter) {
+  // Corregido: Ya no sacamos los featured del catálogo principal.
   let filtered = filter === 'Todos' ? products : products.filter(p => p.category === filter);
+  
   if (searchQuery.trim()) {
     filtered = filtered.filter(p =>
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -136,7 +286,7 @@ function renderProducts(filter) {
   
   // Limpiamos la clase 'animate-in' vieja del HTML
   document.getElementById('productGrid').innerHTML = filtered.map((p, i) => `
-    <div class="product-card ${p.featured ? 'featured' : ''}" onclick="openModal(${p.id})" onmouseenter="startCardHover(${p.id})" onmouseleave="stopCardHover(${p.id})">
+    <div class="product-card" onclick="openModal(${p.id})" onmouseenter="startCardHover(${p.id})" onmouseleave="stopCardHover(${p.id})">
       <div class="product-img-wrapper">
         <div class="otk-badge">handmade</div>
         <div class="serial-stamp">NO. 000${p.id}</div>
@@ -417,7 +567,8 @@ function openModal(id) {
 
     <div class="modal-footer-tech">
       <div class="price-tech">USD ${p.price.toLocaleString()}</div>
-      <button class="btn-approve" onclick="addToCart(${p.id}); closeModal();">APROBAR ORDEN →</button>
+      <a href="producto.html?id=${p.id}" class="btn-approve" style="text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">EXPLORAR LA OBRA →</a>
+      <button class="btn-approve" onclick="addToCart(${p.id}); closeModal();" style="border-left: 2px solid var(--ink);">APROBAR ORDEN →</button>
     </div>
   `;
   
@@ -771,8 +922,8 @@ function sendContactWhatsApp() {
 
   let text = `CONSULTA%0A%0A`;
   text += `Nombre: ${name}%0A`;
-  if (email) text += `*Email:* ${email}%0A`;
-  text += `%0AMensaje:%0A${message}`;
+  if (email) text += `Email: ${email}%0A`;
+  text += `%0A%0A${message}`;
 
   const phoneWP = "59899399624"; 
   const whatsappUrl = `https://wa.me/${phoneWP}?text=${text}`;

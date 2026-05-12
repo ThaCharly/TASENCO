@@ -466,8 +466,8 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 3.5rem 2.5rem; 
-  max-width: 1800px; /* Le abrimos la cancha para que respire en pantallas grandes */
+  gap: 2.0rem 3.0rem; 
+  max-width: 1820px; /* Le abrimos la cancha para que respire en pantallas grandes */
   margin: 0 auto;
   padding: 0 2rem;
 }
@@ -475,9 +475,348 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-  .product-card.featured {
-    grid-column: span 2;
-    grid-row: span 2;
+  /* Eliminamos el spanning de featured para que la grilla sea uniforme */
+}
+
+/* =====================================================
+   ESTILOS DE DESTACADOS (Shelf Integrado)
+   ===================================================== */
+.featured-shelf {
+  padding: 4rem 0;
+  background: var(--bg);
+  background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 100% 6px;
+  border-top: 4px solid var(--ink); /* Volvieron los marcos, no eran los padres */
+  border-bottom: 4px solid var(--ink);
+  position: relative;
+  box-shadow: inset 0 8px 15px rgba(0,0,0,0.04), inset 0 -8px 15px rgba(0,0,0,0.04);
+}
+
+.shelf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 0.5rem;
+}
+
+/* Cambiamos la fuente a Oswald (techno) para soportar mayúsculas y darle peso industrial */
+.shelf-title {
+  font-family: var(--font-techno); 
+  font-size: 3.2rem;
+  color: var(--ink);
+  text-transform: uppercase;
+  margin-bottom: 0;
+  line-height: 1;
+  letter-spacing: 2px;
+}
+.shelf-title::after {
+  content: ' // TOP TIER';
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-left: 1rem;
+  vertical-align: middle;
+}
+
+.shelf-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* =====================================================
+   CARRUSEL DE DESTACADOS (Controles y Grilla)
+   ===================================================== */
+.carousel-btn {
+  position: relative; /* Lo sacamos de la capa absoluta para que no pise nada */
+  width: 45px;
+  height: 45px;
+  background: var(--ink);
+  color: var(--ember);
+  border: 2px solid var(--surface-alt);
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+  padding-bottom: 4px; /* Centrado óptico de la flecha */
+}
+.carousel-btn:hover {
+  background: var(--ember);
+  color: #fff;
+  transform: translateY(-2px); /* Salto sutil en vez de zoom */
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.8);
+}
+
+/* Ampliamos el contenedor específicamente para las Obras Cumbres */
+.featured-shelf .container {
+  max-width: 1550px;
+}
+
+/* Grilla en formato carrusel horizontal */
+.shelf-grid {
+          display: flex;
+          gap: 2.5rem;
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          scroll-behavior: smooth;
+          scroll-snap-type: x mandatory; /* Magia nativa para enganchar las tarjetas */
+          -ms-overflow-style: none; /* Oculta scrollbar en IE/Edge */
+          scrollbar-width: none; /* Oculta scrollbar en Firefox */
+          padding: 1.5rem 0; /* Cero padding horizontal para evitar la dependencia circular de box-sizing */
+          margin: 0;
+          width: 100%;
+          perspective: 1500px; /* Profundidad de cámara para el 3D */
+          position: relative; /* Clave para que el JS mida bien las distancias */
+        }
+
+        /* Espaciadores dinámicos puros. Evitan que el navegador trunque el padding */
+        .shelf-grid::before {
+          content: '';
+          display: block;
+          flex: 0 0 calc(50% - 340px);
+          margin-right: -2.5rem; /* Anula el gap para que la matemática sea exacta */
+        }
+
+        .shelf-grid::after {
+          content: '';
+          display: block;
+          flex: 0 0 calc(50% - 340px);
+          margin-left: -2.5rem; /* Anula el gap para que la matemática sea exacta */
+        }
+.shelf-grid::-webkit-scrollbar {
+  display: none; /* Oculta scrollbar en Chrome, Safari, Opera */
+}
+
+/* Tarjeta especial de destacado, integrada pero con jerarquía */
+.shelf-item {
+  background: var(--surface-alt);
+  border: 2px solid #1a1a1a;
+  /* Tarjetas más anchas e imponentes */
+  flex: 0 0 680px; 
+  max-width: 85vw; /* Protección para que no reviente en celulares */
+  display: flex;
+  gap: 1.5rem; /* Base intocable para móviles */
+  padding: 1.5rem; /* Base intocable para móviles */
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.05);
+  /* Usamos 'translate' suelto para no pelearnos con el JS que dibuja el 3D en el transform */
+  transition: translate 0.4s cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 0.4s, border-color 0.4s;
+  cursor: pointer;
+  position: relative;
+  scroll-snap-align: center; /* Engancha perfecto al medio para el Coverflow */
+  overflow: hidden; /* Fundamental para que la foto absoluta no se desborde */
+  transform-style: preserve-3d;
+}
+
+/* Imagen grande y nítida en destacados */
+.shelf-img-wrapper {
+  flex: 0 0 45%; 
+  aspect-ratio: 1/1; 
+  overflow: hidden;
+  border: 2px solid #1a1a1a;
+  background: var(--surface);
+}
+.shelf-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(10%) contrast(1.02);
+  transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.shelf-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- PC: Galería inmersiva (Imagen completa -> difuminado + texto en hover) --- */
+@media (hover: hover) and (min-width: 601px) {
+  .shelf-item {
+    padding: 0; /* Limpiamos para que la foto toque los bordes del marco */
+    gap: 0;
+  }
+  
+  .shelf-img-wrapper {
+    position: absolute; /* Despegamos la foto del flexbox */
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    aspect-ratio: auto; /* Anulamos el formato cuadrado para que cubra toda la tarjeta */
+    /* Al hacer hover, la foto se retrae de 100% a 45% suavemente */
+    transition: width 0.5s cubic-bezier(0.2, 0.9, 0.2, 1);
+  }
+  
+  .shelf-content {
+    position: relative;
+    z-index: 2;
+    width: 55%; /* La fracción donde van a vivir los datos */
+    margin-left: auto; /* Tira el bloque de texto hacia la derecha */
+    padding: 1.5rem;
+    background: rgba(241, 230, 212, 0.85); /* var(--surface-alt) con opacidad */
+    backdrop-filter: blur(12px); /* El difuminado técnico que querías */
+    -webkit-backdrop-filter: blur(12px);
+    border-left: 2px solid #1a1a1a;
+    opacity: 0;
+    transform: translateX(30px); /* Entra flotando desde la derecha */
+    transition: all 0.5s cubic-bezier(0.2, 0.9, 0.2, 1);
+    pointer-events: none; /* Que el div invisible no te bloquee los clicks de la foto */
+    flex: none;
+  }
+
+  .shelf-item:hover {
+  translate: -3px -3px; /* Propiedad moderna, no pisa el motor 3D */
+  box-shadow: 10px 10px 0 rgba(0,0,0,0.1);
+  border-color: var(--rust-bright);
+}
+  
+  .shelf-item:hover .shelf-img-wrapper {
+    width: 45%; /* La foto se compacta a la izquierda, mostrando todo su contenido */
+    border-right: 2px solid #1a1a1a;
+  }
+  
+  .shelf-item:hover .shelf-img-wrapper img {
+    transform: scale(1.05); /* Leve zoom al revelar la data */
+  }
+
+  .shelf-item:hover .shelf-content {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+}
+
+.shelf-item-title {
+  font-family: var(--font-techno);
+  font-size: 2rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+
+.shelf-item-category {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--olive);
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+}
+
+.shelf-item-desc {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: auto; /* Empuja el pie hacia abajo */
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* El engine clásico de WebKit */
+  line-clamp: 3;         /* El estándar moderno para callar al linter */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.shelf-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  border-top: 1px dotted rgba(26,26,26,0.2);
+  padding-top: 1rem;
+}
+
+.shelf-price {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Botón idéntico al .btn-primary para consistencia absoluta */
+.shelf-btn {
+  display: inline-block;
+  background: var(--rust-bright);
+  color: #fff;
+  padding: 0.6rem 1.4rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  border: 2px solid var(--rust-bright);
+  box-shadow: 4px 4px 0 #1a1a1a; /* La misma sombra negra dura */
+}
+.shelf-btn:hover {
+  background: #000;
+  color: var(--ochre);
+  border-color: #000;
+}
+
+/* (El sello OTK se eliminó de los destacados para limpiar la interfaz) */
+
+/* Responsive para carrusel destacados */
+@media (max-width: 1000px) {
+          .shelf-item { flex: 0 0 85vw; max-width: 85vw; }
+          .shelf-grid { padding: 1.5rem 0; } 
+          .shelf-grid::before,
+          .shelf-grid::after { flex: 0 0 calc(50% - 42.5vw); }
+        }
+@media (max-width: 600px) {
+  .shelf-header { flex-direction: column; align-items: flex-start; gap: 1rem; border-bottom: 2px solid var(--ink); }
+  .shelf-title { font-size: 2.2rem; }
+  .shelf-title::after { display: block; margin-left: 0; margin-top: 0.5rem; }
+  .shelf-controls { display: none; } /* En móvil scrollean con el dedo */
+  
+  /* Rediseño Mobile: Tarjetas verticales panorámicas y elegantes */
+  .shelf-item { 
+    flex: 0 0 85vw; 
+    max-width: 85vw;
+    flex-direction: column; /* Volvemos a apilar, la horizontal era ilegible */
+    align-items: stretch; /* Que ocupe todo el ancho interno */
+    gap: 1.2rem; 
+    padding: 1.2rem;
+  }
+  .shelf-img-wrapper { 
+    flex: 0 0 auto; 
+    width: 100%; 
+    height: auto;
+    aspect-ratio: 16/9; /* Formato panorámico: achata la foto pero mantiene el ancho */
+  }
+  .shelf-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .shelf-item-title { font-size: 1.6rem; margin-bottom: 0.2rem; }
+  .shelf-item-category { font-size: 0.7rem; margin-bottom: 0.5rem; }
+  .shelf-item-desc { 
+    font-size: 0.85rem; 
+    -webkit-line-clamp: 3; /* Le damos una línea más de aire al texto */
+    line-clamp: 3; 
+    margin-bottom: 1rem;
+  }
+  .shelf-footer { 
+    flex-direction: row; 
+    justify-content: space-between; /* Separamos el precio del botón */
+    align-items: center;
+    border-top: 1px dotted rgba(26,26,26,0.2); /* Volvemos a poner el divisor */
+    padding-top: 1rem;
+    margin-top: auto; /* Empuja el footer al fondo si falta texto */
+  }
+  .shelf-price { font-size: 1.3rem; }
+  .shelf-btn { 
+    display: none !important; /* Acá muere el botón, lo prometo */
   }
 }
 
@@ -1430,13 +1769,21 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 }
 
 /* Feedback físico para móviles (sin hover) */
-@media (hover: none) {
-  .product-card:active {
-    transform: scale(0.98);
-    background: var(--surface-alt);
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.15);
-  }
-  .add-btn:active, .qty-btn:active, .cart-btn:active {
+        @media (hover: none) {
+          .product-card:active {
+            transform: translate(-4px, -4px);
+            background: var(--surface-alt);
+            box-shadow: 12px 12px 0 rgba(26,26,26,0.15);
+            border-color: var(--rust); 
+          }
+          .shelf-item:active {
+            translate: -4px -4px !important; /* Efecto hover levantado como en PC */
+            background: var(--surface-alt) !important;
+            box-shadow: 12px 12px 0 rgba(26,26,26,0.15) !important;
+            border-color: var(--rust) !important;
+            transition: translate 0.1s, background 0.1s, border-color 0.1s, box-shadow 0.1s !important;
+          }
+          .add-btn:active, .qty-btn:active, .cart-btn:active {
     transform: scale(0.95);
     background: var(--rust-bright);
     color: #fff;

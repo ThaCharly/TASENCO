@@ -21,7 +21,7 @@
     "description": "La versión potente del Phoenix. Cuatro válvulas EL34 que ofrecen desde cleans cálidos hasta crunch clásico.",
     "specs": ["4× EL34", "Caja de caoba", "Reverb spring + tremolo"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
-    "featured": false,
+    "featured": true,
     "audio": [
       { "name": "Clean Channel", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" },
       { "name": "Drive Channel", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
@@ -35,7 +35,7 @@
     "description": "Cabezal de tres canales con preamplificación híbrida. ECC83 + 6L6.",
     "specs": ["2× ECC83 + 2× 6L6", "Caja de acero y madera", "3 canales independientes"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
-    "featured": false,
+    "featured": true,
     "audio": []
   },
   {
@@ -59,7 +59,7 @@
     "description": "Nuestro amplificador insignia. Cabecera y combo en caja de roble con 100W.",
     "specs": ["8× EL34", "Caja de roble americano", "Cabina 2×12"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
-    "featured": false,
+    "featured": true,
     "audio": []
   },
   {

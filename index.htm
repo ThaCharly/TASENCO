@@ -51,6 +51,28 @@
     </div>
   </section>
 
+  <!-- =====================================================
+       DESTACADOS / OBRAS CUMBRES (Carrusel Infinito Automático)
+       ===================================================== -->
+  <section class="featured-shelf" id="destacados" style="display:none;">
+    <div class="container">
+      <div class="shelf-header">
+        <h2 class="shelf-title">Obras Cumbres</h2>
+        <div class="shelf-controls">
+          <button class="carousel-btn prev" onclick="scrollShelf(-1)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="carousel-btn next" onclick="scrollShelf(1)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="shelf-grid" id="featuredShelfGrid">
+        <!-- Los productos destacados se inyectan acá por JS -->
+      </div>
+    </div>
+  </section>
+
   <section class="products" id="productos">
     <h2 class="section-title">Nuestros amplificadores</h2>
     <p class="section-subtitle">Cada amplificador es ensamblado a mano en nuestro taller, con transformadores hechos a mano y válvulas New-Old-Stock seleccionadas.</p>
