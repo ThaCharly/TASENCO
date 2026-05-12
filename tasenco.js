@@ -609,6 +609,9 @@ function applyPromo() {
   } else if (code === 'TUBE50') {
     discountPercent = 0.5;
     messageEl.textContent = 'Código aplicado: 50% de descuento';
+   } else if (code === 'TUBE5') {
+    discountPercent = 0.05;
+    messageEl.textContent = 'Código aplicado: 5% de descuento';
    }
   else {
     discountPercent = 0;
@@ -618,17 +621,82 @@ function applyPromo() {
 }
 
 function checkout() {
+  const name = document.getElementById('cartName').value.trim();
   const email = document.getElementById('cartEmail').value.trim();
-  if (!email || !email.includes('@')) {
-    showToast('Por favor, introduce un email válido.');
+  const phone = document.getElementById('cartPhone').value.trim();
+  const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+  // Validación básica del lado del cliente
+  if (!name) {
+    showToast('Por favor, decinos tu nombre para el pedido.');
     return;
   }
-  showToast('¡Pedido realizado con éxito! Te enviaremos la confirmación a ' + email);
-  cart = [];
-  discountPercent = 0;
-  saveCart();
-  closeCart();
-  renderCart();
+  if (email && !email.includes('@')) {
+    showToast('Por favor, introducí un email válido.');
+    return;
+  }
+
+  // Extraemos los números calculados en pantalla
+  const total = document.getElementById('totalDisplay').textContent;
+  const shipping = getShippingCost();
+
+  // Enrutador de Pasarelas de Pago
+  switch (paymentMethod) {
+    case 'mercadopago':
+      // TODO: Hacer un POST a tu backend C++ para generar el Preference ID de MercadoPago
+      // y redirigir al init_point que te devuelve la API.
+      showToast('Redirigiendo a MercadoPago... (Próximamente)');
+      console.log("[PAYMENT] Inicializando flujo MercadoPago...");
+      return; 
+      
+    case 'paypal':
+      // TODO: Integrar el SDK de PayPal JS o redirigir a tu endpoint de C++ que maneje la orden.
+      showToast('Redirigiendo a PayPal... (Próximamente)');
+      console.log("[PAYMENT] Inicializando flujo PayPal...");
+      return;
+      
+    case 'stripe':
+      // TODO: Integrar Stripe Elements o Google Pay API.
+      showToast('Abriendo pasarela de tarjetas... (Próximamente)');
+      console.log("[PAYMENT] Inicializando flujo Stripe/GPay...");
+      return;
+
+    case 'whatsapp':
+    default:
+      // Flujo directo y oficial: Cierre de venta "mano a mano"
+      let text = `ORDEN DE COMPRA%0A%0A`;
+      text += `Cliente: ${name}%0A`;
+      if (email) text += `Email: ${email}%0A`;
+      if (phone) text += `Tel: ${phone}%0A`;
+      text += `%0APRODUCTOS:%0A`;
+      
+      cart.forEach(item => {
+        text += `- ${item.quantity}x ${item.product.name} (USD ${item.product.price.toLocaleString()})%0A`;
+      });
+
+      if (discountPercent > 0) {
+        text += `%0ADescuento: ${discountPercent * 100}%%0A`;
+      }
+      text += `Envío: USD ${shipping}%0A`;
+      text += `*TOTAL A PAGAR:* ${total}%0A`;
+      text += `%0AHola! Quiero coordinar el pago y envío de este pedido.`;
+
+      // ⚠️ IMPORTANTE: Cambiá este string por el número de la empresa. Formato: 598 + número sin el 0 inicial.
+      const phoneWP = "59899399624"; 
+      const whatsappUrl = `https://wa.me/${phoneWP}?text=${text}`;
+
+      // Vaciamos la memoria y limpiamos la UI
+      cart = [];
+      discountPercent = 0;
+      saveCart();
+      closeCart();
+      renderCart();
+      
+      // Gatillamos la pestaña de WhatsApp
+      window.open(whatsappUrl, '_blank');
+      showToast('¡Pedido armado! Abriendo WhatsApp...');
+      break;
+  }
 }
 
 function toggleCart() {
@@ -688,6 +756,32 @@ function showToast(msg) {
       removeTimeout = setTimeout(() => t.remove(), 4400);
     }
   });
+}
+
+function sendContactWhatsApp() {
+  const name = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const message = document.getElementById('contactMessage').value.trim();
+
+  // Para WhatsApp no le exigimos el email a prepo, pero nombre y mensaje sí
+  if (!name || !message) {
+    showToast('Por favor, llená tu nombre y el mensaje antes de enviarlo por WhatsApp.');
+    return;
+  }
+
+  let text = `CONSULTA%0A%0A`;
+  text += `Nombre: ${name}%0A`;
+  if (email) text += `*Email:* ${email}%0A`;
+  text += `%0AMensaje:%0A${message}`;
+
+  const phoneWP = "59899399624"; 
+  const whatsappUrl = `https://wa.me/${phoneWP}?text=${text}`;
+  
+  window.open(whatsappUrl, '_blank');
+  showToast('Abriendo WhatsApp...');
+  
+  // Limpiamos el formulario para que quede prolijo
+  document.getElementById('contactForm').reset();
 }
 
 async function handleContact(e) {

@@ -7,7 +7,7 @@
   
   <!-- Open Graph Meta Tags para Redes Sociales -->
   <meta property="og:title" content="TASENCO — Amplificadores Valvulares Boutique" />
-  <meta property="og:description" content="Amplificadores artesanales construidos a mano en Uruguay con componentes NOS. Cada unidad es una pieza única." />
+  <meta property="og:description" content="Amplificadores artesanales construidos a mano en Uruguay con componentes NOS." />
   <!-- OJO: Cuando lo subas a GitHub, cambiá "tu-usuario" y "tu-repo" por tu link real -->
   <meta property="og:image" content="https://thacharly.github.io/TASENCO/images/TASENCOorgnobg.webp" />
   <meta property="og:url" content="https://thacharly.github.io/TASENCO/" />
@@ -96,21 +96,23 @@
         </div>
         <div class="cart-promo">
           <label for="promoCode">Código de promoción <span style="font-size:0.7rem; color:var(--muted); cursor:help; border-bottom: 1px dotted var(--muted);" title="Preguntanos por códigos en lanzamientos">[?]</span></label>
-          <input type="text" id="promoCode" placeholder="Ej: TUBE50" />
+          <input type="text" id="promoCode" placeholder="Ej: TUBE5" />
           <button onclick="applyPromo()">Aplicar</button>
           <span id="promoMessage" style="font-family: var(--font-mono); font-size:0.8rem; color: var(--rust); display:block; margin-top:0.3rem;"></span>
         </div>
         <div class="cart-contact">
           <label>Datos de contacto</label>
-          <input type="email" id="cartEmail" placeholder="Email (obligatorio)" />
-          <input type="tel" id="cartPhone" placeholder="Teléfono" style="margin-top:0.5rem;" />
+          <input type="text" id="cartName" placeholder="Nombre completo (obligatorio)" style="margin-bottom:0.5rem;" />
+          <input type="email" id="cartEmail" placeholder="Email (recomendado)" />
+          <input type="tel" id="cartPhone" placeholder="Teléfono (recomendado)" style="margin-top:0.5rem;" />
         </div>
         <div class="cart-payment">
           <label>Método de pago</label>
-          <div>
-            <label><input type="radio" name="payment" value="card" checked> Tarjeta</label>
+          <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+            <label><input type="radio" name="payment" value="whatsapp" checked> Acordar por WhatsApp</label>
+            <label><input type="radio" name="payment" value="mercadopago"> MercadoPago</label>
             <label><input type="radio" name="payment" value="paypal"> PayPal</label>
-            <label><input type="radio" name="payment" value="transfer"> Transferencia</label>
+            <label><input type="radio" name="payment" value="stripe"> Tarjeta / Google Pay</label>
           </div>
         </div>
         <button class="cart-checkout-btn" onclick="checkout()">Realizar pedido</button>
@@ -133,12 +135,15 @@
       <div class="form-group"><input type="text" id="contactName" name="name" placeholder="Tu nombre" required /></div>
       <div class="form-group"><input type="email" id="contactEmail" name="email" placeholder="Tu email" required /></div>
       <div class="form-group"><textarea id="contactMessage" name="message" placeholder="Tu mensaje..." required></textarea></div>
-      <button type="submit" class="btn-submit" id="submitBtn">Enviar mensaje</button>
+      <div class="contact-actions">
+        <button type="submit" class="btn-submit" id="submitBtn">Enviar por Email</button>
+        <button type="button" class="btn-submit btn-wa" onclick="sendContactWhatsApp()">Enviar por WhatsApp</button>
+      </div>
     </form>
   </section>
 
   <footer class="footer">
-    <span class="footer-logo">TASENCO</span>
+    <span class="footer-logo">Tube Amps and Sound Effects National Company</span>
      <!-- <span class="footer-title">Tube Amps and Sound Effects National Company</span> -->
     <span class="footer-copy">2026 TASENCO®. Todos los derechos reservados.</span>
     <div class="footer-plant">EL PINAR · CANELONES · URUGUAY</div>

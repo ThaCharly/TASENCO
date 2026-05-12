@@ -465,9 +465,9 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 /* Grid de productos */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* antes 340px */
-  gap: 0;
-  max-width: 100%;      /* antes 100% → añade márgenes laterales */
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 3.5rem 2.5rem; 
+  max-width: 1800px; /* Le abrimos la cancha para que respire en pantallas grandes */
   margin: 0 auto;
   padding: 0 2rem;
 }
@@ -484,20 +484,27 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 .product-card {
   background: var(--surface);
   border: 2px solid #1a1a1a;
-  outline: 1px solid var(--olive);
-  outline-offset: -6px;
-  margin: -2px 0 0 -2px;
   display: flex;
   flex-direction: column;
-
   cursor: pointer;
   position: relative;
+  box-shadow: 6px 6px 0 rgba(26,26,26,0.06); /* Sombra base sutil para darle volumen */
+  transition: all 0.3s ease;
 }
 .product-card:hover {
-  box-shadow: 8px 8px 0 rgba(0,0,0,0.15);
-  transform: translate(-2px, -2px);
+  box-shadow: 12px 12px 0 rgba(26,26,26,0.15);
+  transform: translate(-4px, -4px);
   z-index: 2;
-  outline-color: var(--rust);
+  border-color: var(--rust);
+}
+
+/* --- DIVERSIDAD VISUAL DINÁMICA --- */
+/* Mantenemos solo la rotura de simetría del parche OTK, el resto queda limpio y uniforme */
+.product-card:nth-child(3n - 1) .otk-badge {
+  left: auto;
+  right: -10px;
+  transform: rotate(3deg);
+  background: var(--ink); /* Variante oscura del parche */
 }
 
 .product-img-wrapper {
@@ -559,7 +566,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: var(--surface);
+  background: transparent; /* Hereda el fondo de la carta padre para mantener la diversidad */
 }
 .product-category {
   font-family: var(--font-mono);
@@ -1243,9 +1250,16 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 .form-group textarea {
   min-height: 140px;
 }
+.contact-actions {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
 .btn-submit {
-  align-self: flex-start;
-  padding: 0.9rem 3rem;
+  flex: 1;
+  min-width: 200px;
+  padding: 0.9rem 2rem;
   background: #1a1a1a;
   color: #fff;
   font-family: var(--font-mono);
@@ -1254,11 +1268,24 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   border: 2px solid #1a1a1a;
   transition: 0.2s;
   box-shadow: 4px 4px 0 var(--olive);
+  text-align: center;
 }
 .btn-submit:hover {
   background: var(--rust-bright);
   border-color: var(--rust-bright);
   box-shadow: 6px 6px 0 var(--rust);
+}
+/* Estilo invertido para el botón de WhatsApp, mantiene la onda industrial */
+.btn-wa {
+  background: var(--surface-alt);
+  color: var(--ink);
+  box-shadow: 4px 4px 0 var(--rust);
+}
+.btn-wa:hover {
+  background: var(--surface);
+  color: var(--rust-bright);
+  border-color: var(--ink);
+  box-shadow: 6px 6px 0 var(--ink);
 }
 
 /* FOOTER con datos de fábrica */
@@ -1276,7 +1303,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 }
 .footer-logo {
   font-family: var(--font-stamp);
-  font-size: 1.2rem;
+  font-size: 0.8rem;
   color: var(--rust);
 }
 .footer-links {
@@ -1449,9 +1476,9 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   .product-grid {
     grid-template-columns: 1fr !important;
     padding: 0 1rem;
-    gap: 1.5rem;
+    gap: 2.5rem; /* Respiro vertical en celular */
   }
-  .product-card { margin: 0; outline-offset: -4px; }
+  .product-card { margin: 0; }
   .filter-bar {
     flex-wrap: nowrap;
     overflow-x: auto;

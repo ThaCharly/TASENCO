@@ -1,0 +1,90 @@
+1. El Checkout (De la simulación a la realidad)
+
+Ahora mismo, cuando le das a "Realizar pedido", el carrito se vacía y tira un toast. Para una marca boutique, donde cada ampli vale miles de dólares y se hace a pedido, dudo que vayas a cobrar por un gateway automático de una.
+
+La movida ganadora: Cambiar esa función para que arme un mensaje de WhatsApp dinámico y te mande directo a chatear con el taller. Es gratis, directo y cierra ventas.
+
+Cambiá tu función checkout() por algo así:
+JavaScript
+
+function checkout() {
+  const email = document.getElementById('cartEmail').value.trim();
+  if (!email || !email.includes('@')) {
+    showToast('Por favor, introduce un email válido.');
+    return;
+  }
+
+  // Armamos el recibo para enviarlo por WhatsApp
+  let text = `*NUEVA ORDEN DE COMPRA - TASENCO*%0A%0A`;
+  text += `*Contacto:* ${email}%0A`;
+  text += `*Productos:*%0A`;
+  
+  cart.forEach(item => {
+    text += `- ${item.quantity}x ${item.product.name} (USD ${item.product.price})%0A`;
+  });
+
+  const total = document.getElementById('totalDisplay').textContent;
+  text += `%0A*TOTAL:* ${total}%0A`;
+  text += `%0A¡Hola! Quiero confirmar este pedido.`;
+
+  // Cambiá este número por el celular oficial de TASENCO (código de país + número, sin el + ni espacios)
+  const phone = "59899123456"; 
+  const whatsappUrl = `https://wa.me/${phone}?text=${text}`;
+
+  // Vaciamos el carrito local y abrimos WhatsApp en otra pestaña
+  cart = [];
+  saveCart();
+  closeCart();
+  renderCart();
+  
+  window.open(whatsappUrl, '_blank');
+}
+
+2. Estado de Carga (Loading State)
+
+Tu función bootCatalog() le pega al backend en C++. Si ese servidor demora 500ms o 1 segundo en responder (o si la base de datos está fría), el usuario va a ver la grilla vacía y puede pensar que la página está rota antes de que salte el modo offline.
+
+Solución: Meté un estado de carga por defecto en el HTML. En tu <div class="product-grid" id="productGrid">, clavale un textito o un spinner.
+HTML
+
+<div class="product-grid" id="productGrid">
+  <div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--rust); font-family: var(--font-mono);">
+    [ INICIALIZANDO VÁLVULAS... ]
+  </div>
+</div>
+
+Cuando renderProducts() se ejecute, va a pisar ese texto con las tarjetas reales de una, así que ni tenés que programar lógica extra para borrarlo.
+3. Optimización de Assets (Imágenes y Audio)
+
+    Imágenes: Usaste .webp, lo cual es un golazo de media cancha para la performance. Solo asegurate de que las fotos originales del collage y el lightbox no pesen más de 300-500 KB cada una.
+
+    Audio: Los tests de diagnóstico son una idea brutal. Pero ojo al subir los archivos finales. No subas WAVs crudos de 50MB porque vas a matar los datos móviles de los clientes. Usá .mp3 a 320kbps o .ogg de alta calidad; vas a retener el 99% de la fidelidad tonal por una fracción del peso.
+
+4. SEO y Metadatos de la vieja escuela
+
+Pusiste los Open Graph (los og:) que son los que leen WhatsApp, Instagram y Twitter para armar la tarjetita linda cuando pasás el link. Eso está perfecto. Pero te olvidaste del meta tradicional que lee San Google. Agregá esto en tu <head>:
+HTML
+
+<meta name="description" content="TASENCO: Amplificadores valvulares boutique uruguayos. Fabricados a mano con componentes NOS y diseño analógico de alta fidelidad." />
+<meta name="keywords" content="amplificadores valvulares, boutique, EL34, ECC83, audio analógico, Uruguay, TASENCO" />
+
+Y ya que estamos, en la etiqueta <html> de arriba del todo, podés ajustarla a <html lang="es-UY"> para darle contexto regional al motor de búsqueda.
+5. Botón de "Seguir comprando" en el carrito
+
+Cuando el carrito está vacío, el usuario tiene que hacer clic en la cruz o fuera del modal para cerrarlo. Hacela más fácil:
+
+Buscá en renderCart() donde dice:
+JavaScript
+
+container.innerHTML = `<div class="cart-empty">Tu carrito está vacío.</div>`;
+
+Y cambialo por:
+JavaScript
+
+container.innerHTML = `
+  <div class="cart-empty">
+    <p style="margin-bottom: 1rem;">Tu carrito está vacío.</p>
+    <button class="btn-primary" onclick="closeCart()">Volver al catálogo</button>
+  </div>`;
+
+Con esto, pasás de un prototipo a un sistema robusto, listo para recibir tráfico real sin transpirar.
