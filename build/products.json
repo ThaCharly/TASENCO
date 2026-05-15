@@ -9,8 +9,8 @@
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": [
-      { "name": "Clean (Neck)", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" },
-      { "name": "Crunch (Bridge)", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
+      { "name": "Clean (Neck)", "url": "./audio/elfaro.m4a" },
+      { "name": "Crunch (Bridge)", "url": "./audio/voodoo.m4a" }
     ]
   },
   {
@@ -23,8 +23,8 @@
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": true,
     "audio": [
-      { "name": "Clean Channel", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" },
-      { "name": "Drive Channel", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
+      { "name": "Clean (Neck)", "url": "./audio/elfaro.m4a" },
+      { "name": "Crunch (Bridge)", "url": "./audio/voodoo.m4a" }
     ]
   },
   {
@@ -36,7 +36,10 @@
     "specs": ["2× ECC83 + 2× 6L6", "Caja de acero y madera", "3 canales independientes"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": true,
-    "audio": []
+    "audio": [
+      { "name": "Clean (Neck)", "url": "./audio/elfaro.m4a" },
+      { "name": "Crunch (Bridge)", "url": "./audio/voodoo.m4a" }
+    ]
   },
   {
     "id": 4,
@@ -48,7 +51,7 @@
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": [
-      { "name": "Vintage Tone", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" }
+      { "name": "Vintage Tone", "url": "./audio/lagranja.m4a" }
     ]
   },
   {
@@ -60,7 +63,10 @@
     "specs": ["8× EL34", "Caja de roble americano", "Cabina 2×12"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": true,
-    "audio": []
+    "audio": [
+      { "name": "Clean Channel", "url": "./audio/voodoo.m4a" },
+      { "name": "Drive Channel", "url": "./audio/elfaro.m4a" }
+      ]
   },
   {
     "id": 6,
@@ -72,7 +78,7 @@
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": [
-      { "name": "Slapback Delay", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
+      { "name": "Slapback Delay", "url": "./audio/guanderful.m4a" }
     ]
   }
 ]

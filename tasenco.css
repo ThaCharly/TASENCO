@@ -571,48 +571,55 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
           scroll-snap-type: x mandatory; /* Magia nativa para enganchar las tarjetas */
           -ms-overflow-style: none; /* Oculta scrollbar en IE/Edge */
           scrollbar-width: none; /* Oculta scrollbar en Firefox */
-          padding: 1.5rem 0; /* Cero padding horizontal para evitar la dependencia circular de box-sizing */
+          padding: 1.5rem 0;
           margin: 0;
           width: 100%;
           perspective: 1500px; /* Profundidad de cámara para el 3D */
           position: relative; /* Clave para que el JS mida bien las distancias */
         }
 
-        /* Espaciadores dinámicos puros. Evitan que el navegador trunque el padding */
+        /* Espaciadores puros. Le restamos el gap (2.5rem) de la ecuación para que la tarjeta calce perfecto en el centro matemático */
         .shelf-grid::before {
           content: '';
           display: block;
-          flex: 0 0 calc(50% - 340px);
-          margin-right: -2.5rem; /* Anula el gap para que la matemática sea exacta */
+          flex: 0 0 calc(50% - 340px - 2.5rem); 
         }
 
         .shelf-grid::after {
           content: '';
           display: block;
-          flex: 0 0 calc(50% - 340px);
-          margin-left: -2.5rem; /* Anula el gap para que la matemática sea exacta */
+          flex: 0 0 calc(50% - 340px - 2.5rem); 
         }
 .shelf-grid::-webkit-scrollbar {
   display: none; /* Oculta scrollbar en Chrome, Safari, Opera */
 }
 
-/* Tarjeta especial de destacado, integrada pero con jerarquía */
+/* LA CAJA FANTASMA: Se encarga exclusivamente del tamaño y del anclaje del scroll. Nunca se deforma. */
+.shelf-snap-box {
+  flex: 0 0 680px; 
+  max-width: 85vw;
+  scroll-snap-align: center;
+  position: relative;
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tarjeta visual: Solo se encarga de la estética y recibe los transforms 3D del JS */
 .shelf-item {
   background: var(--surface-alt);
   border: 2px solid #1a1a1a;
-  /* Tarjetas más anchas e imponentes */
-  flex: 0 0 680px; 
-  max-width: 85vw; /* Protección para que no reviente en celulares */
+  width: 100%; /* Ocupa el 100% de la caja fantasma */
+  min-height: 100%;
+  align-self: stretch;
   display: flex;
-  gap: 1.5rem; /* Base intocable para móviles */
-  padding: 1.5rem; /* Base intocable para móviles */
+  gap: 1.5rem; 
+  padding: 1.5rem; 
   box-shadow: 6px 6px 0 rgba(0,0,0,0.05);
-  /* Usamos 'translate' suelto para no pelearnos con el JS que dibuja el 3D en el transform */
   transition: translate 0.4s cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 0.4s, border-color 0.4s;
   cursor: pointer;
   position: relative;
-  scroll-snap-align: center; /* Engancha perfecto al medio para el Coverflow */
-  overflow: hidden; /* Fundamental para que la foto absoluta no se desborde */
+  overflow: hidden; 
   transform-style: preserve-3d;
 }
 
@@ -667,7 +674,7 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
     -webkit-backdrop-filter: blur(12px);
     border-left: 2px solid #1a1a1a;
     opacity: 0;
-    transform: translateX(30px); /* Entra flotando desde la derecha */
+    /* Eliminamos el transform (translateX) porque rompía el bounding box virtual del scroll-snap */
     transition: all 0.5s cubic-bezier(0.2, 0.9, 0.2, 1);
     pointer-events: none; /* Que el div invisible no te bloquee los clicks de la foto */
     flex: none;
@@ -690,7 +697,6 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 
   .shelf-item:hover .shelf-content {
     opacity: 1;
-    transform: translateX(0);
     pointer-events: auto;
   }
 }
@@ -767,10 +773,11 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
 
 /* Responsive para carrusel destacados */
 @media (max-width: 1000px) {
-          .shelf-item { flex: 0 0 85vw; max-width: 85vw; }
+          .shelf-snap-box { flex: 0 0 85vw; max-width: 85vw; }
           .shelf-grid { padding: 1.5rem 0; } 
+          /* Misma lógica que en PC: le comemos el espacio del gap a los espaciadores fantasmas */
           .shelf-grid::before,
-          .shelf-grid::after { flex: 0 0 calc(50% - 42.5vw); }
+          .shelf-grid::after { flex: 0 0 calc(50% - 42.5vw - 2.5rem); }
         }
 @media (max-width: 600px) {
   .shelf-header { flex-direction: column; align-items: flex-start; gap: 1rem; border-bottom: 2px solid var(--ink); }
@@ -779,9 +786,11 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   .shelf-controls { display: none; } /* En móvil scrollean con el dedo */
   
   /* Rediseño Mobile: Tarjetas verticales panorámicas y elegantes */
-  .shelf-item { 
+  .shelf-snap-box { 
     flex: 0 0 85vw; 
     max-width: 85vw;
+  }
+  .shelf-item { 
     flex-direction: column; /* Volvemos a apilar, la horizontal era ilegible */
     align-items: stretch; /* Que ocupe todo el ancho interno */
     gap: 1.2rem; 
@@ -1289,13 +1298,29 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
   border: 2px solid var(--ink);
   cursor: pointer;
   position: relative;
+  touch-action: none;
+}
+.progress-wrapper::after {
+  content: '';
+  position: absolute;
+  top: -20px;
+  bottom: -20px;
+  left: -10px;
+  right: -10px;
+  background: transparent;
+  z-index: 1; /* Atrapa el evento del dedo antes de que toque el fondo */
 }
 .progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
   width: 0%;
+  min-width: 3px; /* Pa' que siempre marque presencia aunque esté en 0% */
   background: var(--ember);
-  pointer-events: none;
+  pointer-events: none; /* Deja que el click traspase directo al wrapper */
   transition: width 0.1s linear;
+  z-index: 2; /* A la fuerza para adelante, arriba del campo invisible */
 }
 .time-display {
   font-family: var(--font-mono);
@@ -1931,8 +1956,22 @@ filter: drop-shadow(0 0 6px var(--rust-bright));
     font-size: 0.95rem;
   }
   
-  .audio-controls-custom { flex-direction: column; align-items: stretch; gap: 0.5rem; }
-  .time-display { text-align: left; }
+  /* --- REARMADO DEL REPRODUCTOR MOBILE --- */
+  .audio-controls-custom { 
+    flex-direction: column !important; 
+    align-items: stretch !important; 
+    gap: 0.8rem; 
+  }
+  .time-display { 
+    text-align: left; 
+  }
+  .progress-wrapper {
+    flex: none !important; 
+    height: 14px !important; /* Clavamos la altura real */
+    width: auto !important; /* El 'stretch' del padre se encarga del ancho, así no desborda */
+  }
+
+  /* --- CIRUGÍA DEL SLIDER MOBILE (AL FINAL DE LA CASCADA) --- */
 
   /* Ajuste definitivo para el carrito en mobile */
   .cart-overlay {

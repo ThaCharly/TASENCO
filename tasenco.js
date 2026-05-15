@@ -13,76 +13,82 @@ const localFallbackProducts = [
     "id": 1,
     "name": "TestAmp5W",
     "category": "Combo",
-    "price": 999,
+    "price": 699,
     "description": "Combo de 5 watts con una sola válvula EL34. Sonido limpio y cristalino que se rompe con gracia al subir el volumen.",
     "specs": ["1× EL34", "Caja de pino americano", "Reverb spring"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
-    "featured": false,
+    "featured": true, // ACTIVADO
     "audio": [
-      { "name": "Clean (Neck)", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" },
-      { "name": "Crunch (Bridge)", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
+      { "name": "Clean (Neck)", "url": "./audio/elfaro.m4a" },
+      { "name": "Crunch (Bridge)", "url": "./audio/voodoo.m4a" }
     ]
   },
   {
     "id": 2,
     "name": "TestAmp50W",
     "category": "Combo",
-    "price": 1999,
+    "price": 899,
     "description": "La versión potente del Phoenix. Cuatro válvulas EL34 que ofrecen desde cleans cálidos hasta crunch clásico.",
     "specs": ["4× EL34", "Caja de caoba", "Reverb spring + tremolo"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
-    "featured": false,
+    "featured": true, // ACTIVADO
     "audio": [
-      { "name": "Clean Channel", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" },
-      { "name": "Drive Channel", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
+      { "name": "Clean Channel", "url": "./audio/voodoo.m4a" },
+      { "name": "Drive Channel", "url": "./audio/elfaro.m4a" }
     ]
   },
   {
     "id": 3,
     "name": "TestAmp15W",
     "category": "Cabezal",
-    "price": 1499,
+    "price": 799,
     "description": "Cabezal de tres canales con preamplificación híbrida. ECC83 + 6L6.",
     "specs": ["2× ECC83 + 2× 6L6", "Caja de acero y madera", "3 canales independientes"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
-    "audio": []
+    "audio": [
+      { "name": "Clean Channel", "url": "./audio/voodoo.m4a" },
+      { "name": "Drive Channel", "url": "./audio/elfaro.m4a" }
+    ]
   },
   {
     "id": 4,
     "name": "TestAmp3W",
     "category": "Combo",
-    "price": 799,
+    "price": 599,
     "description": "Pequeño pero poderoso. Un solo EL84 que produce un sonido vintage inconfundible.",
     "specs": ["1× EL84", "Caja de pino", "Puerto de altavoz 8"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": [
-      { "name": "Vintage Tone", "url": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" }
+      { "name": "Vintage Tone", "url": "./audio/lagranja.m4a" }
     ]
   },
   {
     "id": 5,
     "name": "TestAmp100W",
     "category": "Cabezal y caja",
-    "price": 2999,
+    "price": 999,
     "description": "Nuestro amplificador insignia. Cabecera y combo en caja de roble con 100W.",
     "specs": ["8× EL34", "Caja de roble americano", "Cabina 2×12"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
-    "featured": false,
-    "audio": []
+    "featured": true, // ACTIVADO
+    "audio": [
+      { "name": "Clean Channel", "url": "./audio/voodoo.m4a" },
+      { "name": "Drive Channel", "url": "./audio/elfaro.m4a" }
+    ]
   },
   {
     "id": 6,
     "name": "TestPedal",
     "category": "Pedales",
-    "price": 299,
+    "price": 199,
     "description": "Pedal de delay analógico con válvula ECC83. Hasta 12 segundos de eco.",
     "specs": ["1× ECC83", "Circuito totalmente analógico", "Control de tempo, feedback y tone"],
     "image": ["./images/TASENCObk.webp", "./images/TASENCO.png", "./images/TASENCO.webp"],
     "featured": false,
     "audio": [
-      { "name": "Slapback Delay", "url": "https://actions.google.com/sounds/v1/weapons/retro_laser_gun_shoot.ogg" }
+      { "name": "Slapback Delay", "url": "./audio/guanderful.m4a" }
     ]
   }
 ];
@@ -140,19 +146,21 @@ function renderFeaturedShelf() {
 
   section.style.display = 'block';
 
-  // Ya no triplicamos nada, inyectamos los productos limpios y reales
+  // Inyectamos las tarjetas envueltas en CAJAS FANTASMA (.shelf-snap-box)
   grid.innerHTML = featured.map(p => `
-    <div class="shelf-item" onclick="openModal(${p.id})">
-      <div class="shelf-img-wrapper">
-        <img src="${Array.isArray(p.images) ? p.images[0] : (Array.isArray(p.image) ? p.image[0] : (p.image || './images/TASENCObk.webp'))}" alt="${p.name}" />
-      </div>
-      <div class="shelf-content">
-        <h3 class="shelf-item-title">${p.name}</h3>
-        <span class="shelf-item-category">${p.category}</span>
-        <p class="shelf-item-desc">${p.description}</p>
-        <div class="shelf-footer">
-          <span class="shelf-price">USD ${p.price.toLocaleString()}</span>
-          <a href="producto.html?id=${p.id}" class="shelf-btn" onclick="event.stopPropagation();">Explorar la Obra →</a>
+    <div class="shelf-snap-box">
+      <div class="shelf-item" onclick="openModal(${p.id})">
+        <div class="shelf-img-wrapper">
+          <img src="${Array.isArray(p.images) ? p.images[0] : (Array.isArray(p.image) ? p.image[0] : (p.image || './images/TASENCObk.webp'))}" alt="${p.name}" />
+        </div>
+        <div class="shelf-content">
+          <h3 class="shelf-item-title">${p.name}</h3>
+          <span class="shelf-item-category">${p.category}</span>
+          <p class="shelf-item-desc">${p.description}</p>
+          <div class="shelf-footer">
+            <span class="shelf-price">USD ${p.price.toLocaleString()}</span>
+            <a href="producto.html?id=${p.id}" class="shelf-btn" onclick="event.stopPropagation();">Explorar la Obra →</a>
+          </div>
         </div>
       </div>
     </div>
@@ -168,16 +176,14 @@ function renderFeaturedShelf() {
     if(controls) controls.style.display = 'flex';
     grid.style.justifyContent = 'flex-start';
 
-    // Arrancamos el motor automático
     startAutoScroll();
 
-    // Detenemos el auto-scroll si el usuario interactúa para no sacarle la lectura
     grid.addEventListener('mouseenter', stopAutoScroll);
     grid.addEventListener('mouseleave', startAutoScroll);
     grid.addEventListener('touchstart', stopAutoScroll, {passive: true});
     grid.addEventListener('touchend', startAutoScroll, {passive: true});
 
-    // Arrancamos el Motor 3D Coverflow
+    // Arrancamos el Motor 3D Coverflow LIMPIO (Sin hacks raros)
     grid.addEventListener('scroll', updateCoverflow);
     window.addEventListener('resize', updateCoverflow);
     setTimeout(updateCoverflow, 100); 
@@ -188,7 +194,6 @@ function updateCoverflow() {
   const grid = document.getElementById('featuredShelfGrid');
   if (!grid) return;
 
-  // Si bajamos a celular, matamos los cálculos 3D para ahorrar batería y limpiar estilos residuales
   if (window.innerWidth <= 600) {
     grid.querySelectorAll('.shelf-item').forEach(item => {
       item.style.transform = '';
@@ -198,23 +203,24 @@ function updateCoverflow() {
     return;
   }
 
-  // Usamos matemática pura de layout (offsetLeft/scrollLeft) para ignorar la distorsión del 3D
   const gridCenter = grid.scrollLeft + (grid.clientWidth / 2);
 
-  grid.querySelectorAll('.shelf-item').forEach(item => {
-    // El centro exacto de la tarjeta en el espacio real, sin importar su profundidad Z
-    const itemCenter = item.offsetLeft + (item.offsetWidth / 2);
-    const distance = itemCenter - gridCenter;
+  // Iteramos sobre las CAJAS FANTASMA, que nunca se deforman
+  grid.querySelectorAll('.shelf-snap-box').forEach(box => {
+    const item = box.querySelector('.shelf-item');
+    
+    // Medimos la posición de la caja inmutable, no de la tarjeta
+    const boxCenter = box.offsetLeft + (box.offsetWidth / 2);
+    const distance = boxCenter - gridCenter;
 
-    // Normalizamos la distancia matemática (de -1 a 1)
     let ratio = distance / (grid.clientWidth / 2);
     ratio = Math.max(-1, Math.min(1, ratio));
 
-    // Geometría 3D Plana: Escala, Hundimiento recto y Opacidad
     const scale = 1 - Math.abs(ratio) * 0.12; 
     const z = Math.abs(ratio) * -200; 
     const opacity = 1 - Math.abs(ratio) * 0.35; 
     
+    // Le aplicamos la deformación SOLO al interior
     item.style.transform = `translateZ(${z}px) scale(${scale})`;
     item.style.zIndex = Math.round(100 - Math.abs(ratio) * 10);
     item.style.opacity = opacity;
@@ -225,7 +231,7 @@ function startAutoScroll() {
   stopAutoScroll();
   autoScrollTimer = setInterval(() => {
     scrollShelf(1);
-  }, 4500); // 4.5 segundos, buen ritmo
+  }, 4500);
 }
 
 function stopAutoScroll() {
@@ -234,7 +240,8 @@ function stopAutoScroll() {
 
 function scrollShelf(direction) {
   const grid = document.getElementById('featuredShelfGrid');
-  const items = Array.from(grid.querySelectorAll('.shelf-item'));
+  // Ahora scrolleamos y medimos usando las cajas invisibles
+  const items = Array.from(grid.querySelectorAll('.shelf-snap-box'));
   if (items.length === 0) return;
   
   const gridCenter = grid.scrollLeft + (grid.clientWidth / 2);
@@ -261,11 +268,12 @@ function scrollShelf(direction) {
   
   const targetItem = items[targetIndex];
   
-  // Usamos el API nativo de centrado para que el navegador resuelva el cálculo sin pelear con el scroll-snap del CSS
-  targetItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  const targetScroll = targetItem.offsetLeft - (grid.clientWidth / 2) + (targetItem.offsetWidth / 2);
+  
+  grid.scrollTo({ left: targetScroll, behavior: 'smooth' });
   
   startAutoScroll();
-} 
+}
 
 function renderFilters() {
   document.getElementById('filterBar').innerHTML = categories.map(cat =>
@@ -336,7 +344,18 @@ function setFilter(cat) { activeFilter = cat; renderFilters(); renderProducts(ca
 
 // --- LÓGICA DEL REPRODUCTOR DE AUDIO GLOBAL ---
 const audioPlayer = new Audio();
+// MAGIA: Obligamos al navegador a pre-cargar solo la cabecera del archivo (el moov atom)
+audioPlayer.preload = 'metadata'; 
 let isPlaying = false;
+
+// NUEVO EVENTO: Se dispara en cuanto el navegador termina de leer los metadatos y ya sabe la duración matemática
+audioPlayer.addEventListener('loadedmetadata', () => {
+  const timeDisp = document.getElementById('timeDisplay');
+  if (timeDisp && isFinite(audioPlayer.duration)) {
+    // Inyectamos el 0:00 inicial y la duración total real que recién calculó
+    timeDisp.textContent = `0:00 / ${formatTime(audioPlayer.duration)}`;
+  }
+});
 
 // Evento que actualiza la barra y el tiempo milisegundo a milisegundo
 audioPlayer.addEventListener('timeupdate', () => {
@@ -424,13 +443,47 @@ function togglePlay() {
   }
 }
 
-// Permite cliquear en la barra para adelantar el riff
-function seekAudio(e) {
+// --- LÓGICA DE DRAG & DROP FLUIDO PARA EL AUDIO ---
+let isDraggingAudio = false;
+
+window.startDragAudio = function(e) {
   if (!audioPlayer.duration) return;
+  isDraggingAudio = true;
   const wrapper = document.getElementById('progressWrapper');
+  
+  // Capturamos el puntero (dedo/mouse) de forma exclusiva. 
+  // Esto permite seguir arrastrando el audio aunque te salgas del div sin querer.
+  wrapper.setPointerCapture(e.pointerId);
+  
+  // Procesamos el salto inicial donde tocaste
+  updateAudioProgress(e, wrapper);
+
+  // Mientras arrastramos el dedo/mouse
+  wrapper.onpointermove = (ev) => {
+    if (isDraggingAudio) updateAudioProgress(ev, wrapper);
+  };
+
+  // Cuando levantamos el dedo/soltamos el click
+  wrapper.onpointerup = (ev) => {
+    isDraggingAudio = false;
+    wrapper.releasePointerCapture(ev.pointerId);
+    // Limpiamos los eventos para no gastar memoria
+    wrapper.onpointermove = null;
+    wrapper.onpointerup = null;
+  };
+};
+
+function updateAudioProgress(e, wrapper) {
   const rect = wrapper.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
+  let clickX = e.clientX - rect.left;
+  
+  // Matemática pura: Clampeamos el valor para que no se pase del 0% ni del 100%
+  // si el usuario arrastra el mouse por fuera de los límites de la barra.
+  clickX = Math.max(0, Math.min(clickX, rect.width));
   const percent = clickX / rect.width;
+  
+  // Modificamos el tiempo real del audio. El evento 'timeupdate' que ya tenés armado 
+  // se va a encargar de pintar la barra naranja al instante.
   audioPlayer.currentTime = percent * audioPlayer.duration;
 }
 // ----------------------------------------------
@@ -527,7 +580,7 @@ function openModal(id) {
         </div>
         <div class="audio-controls-custom">
           <button class="play-btn-custom" id="playBtn" onclick="togglePlay()">▶</button>
-          <div class="progress-wrapper" id="progressWrapper" onclick="seekAudio(event)">
+          <div class="progress-wrapper" id="progressWrapper" onpointerdown="startDragAudio(event)">
             <div class="progress-fill" id="progressFill"></div>
           </div>
           <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
