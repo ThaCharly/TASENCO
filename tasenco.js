@@ -159,7 +159,6 @@ function renderFeaturedShelf() {
           <p class="shelf-item-desc">${p.description}</p>
           <div class="shelf-footer">
             <span class="shelf-price">USD ${p.price.toLocaleString()}</span>
-            <a href="producto.html?id=${p.id}" class="shelf-btn" onclick="event.stopPropagation();">Explorar la Obra →</a>
           </div>
         </div>
       </div>
@@ -574,7 +573,7 @@ function openModal(id) {
   if (p.audio && p.audio.length > 0) {
     audioHTML = `
       <div class="audio-section">
-        <div class="section-label">PRUEBAS DE DIAGNÓSTICO <span>[HZ/WAV]</span></div>
+        <div class="section-label">MUESTRAS DE AUDIO</div>
         <div class="track-list" id="trackList">
           ${p.audio.map((trk, i) => `<button class="track-btn ${i===0?'active':''}" onclick="loadTrack('${trk.url}', this)">${trk.name}</button>`).join('')}
         </div>
@@ -592,19 +591,19 @@ function openModal(id) {
   // Inyectamos el Plano completo en el Body
   document.getElementById('modalBody').innerHTML = `
     <div class="cajetin">
-      <div class="c-cell c-title">PLANO // ${p.name}</div>
+      <div class="c-cell c-title">FICHA TÉCNICA // ${p.name}</div>
       <div class="c-cell">REV: A</div>
       <div class="c-cell" style="color: var(--muted);">${p.category}</div>
     </div>
 
     <div class="blueprint-content">
       <div class="notes-section">
-        <div class="section-label">NOTAS DE INGENIERÍA <span>[REF. 01]</span></div>
+        <div class="section-label">DESCRIPCIÓN DEL EQUIPO</div>
         <p>${p.description}</p>
       </div>
 
       <div class="specs-section">
-        <div class="section-label">L.D.M. (LISTA DE MATERIALES) <span>[BOM]</span></div>
+        <div class="section-label">ESPECIFICACIONES TÉCNICAS</div>
         <table class="spec-table">
           ${p.specs.map(s => {
             const parts = s.split(' ');
@@ -620,8 +619,7 @@ function openModal(id) {
 
     <div class="modal-footer-tech">
       <div class="price-tech">USD ${p.price.toLocaleString()}</div>
-      <a href="producto.html?id=${p.id}" class="btn-approve" style="text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">EXPLORAR LA OBRA →</a>
-      <button class="btn-approve" onclick="addToCart(${p.id}); closeModal();" style="border-left: 2px solid var(--ink);">APROBAR ORDEN →</button>
+      <button class="btn-approve" onclick="addToCart(${p.id}); closeModal();">AGREGAR AL CARRITO →</button>
     </div>
   `;
   
